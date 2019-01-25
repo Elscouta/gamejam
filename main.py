@@ -7,15 +7,15 @@ from player import Player
 
 pg.init()
 
-DISPLAYSURF = pg.display.set_mode((640, 480))
+screen = pg.display.set_mode((640, 480))
 
 pg.display.set_caption("My First Game")
 
-all_sprites = pg.sprite.Group()
+# all_sprites = pg.sprite.Group()
 
-player = Player((0, 50))
+player = Player()
 
-all_sprites.add(player)
+# all_sprites.add(player)
 
 while True:
     for event in pg.event.get():
@@ -23,5 +23,10 @@ while True:
             pg.quit()
             sys.exit()
 
+    screen.fill((0, 0, 0))
+
+    player.handle_keys()
+    player.draw(screen)
+
     pg.display.update()
-    all_sprites.draw(DISPLAYSURF)
+    # all_sprites.draw(DISPLAYSURF)
