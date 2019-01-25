@@ -39,3 +39,15 @@ luac.out
 *.x86_64
 *.hex
 
+# Poco-8
+backup
+bbs
+cdata
+cstore
+plates
+log.txt
+config.txt
+sdl_controllers.txt
+
+# Vim
+*.swp
