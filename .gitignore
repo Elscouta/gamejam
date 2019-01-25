@@ -3,7 +3,7 @@
 # IntelliJ
 .idea
 .vscode
-__pycache
+__pycache__
 
 # Compiled Lua sources
 luac.out
