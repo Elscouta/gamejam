@@ -1,5 +1,6 @@
 import random
-from itertools import chain
+from itertools import chain, product
+from sys import stdout
 
 MAP_WIDTH = 10
 MAP_HEIGHT = 10
@@ -14,7 +15,7 @@ OutsideMap = object()
 DIRECTIONS = ['north', 'east', 'south', 'west']
 def get_dir(obj, dir):
     assert dir in DIRECTIONS
-    return getattr(obj, dir)
+    return getattr(obj, dir)()
 
 
 class Room:
@@ -34,10 +35,13 @@ class Room:
         return h_edges[self.x][self.y+1]
 
     def east(self):
-        return v_edges[self.x][self.y+1]
+        return v_edges[self.x+1][self.y]
 
     def west(self):
         return v_edges[self.x][self.y]
+
+    def __str__(self):
+        return '.'
 
 
 class Edge:
@@ -89,7 +93,13 @@ class Edge:
 
 
 class Wall(Edge):
-    pass
+    def __str__(self):
+        if self.dir == Edge.HORIZ:
+            return '-'
+        elif self.dir == Edge.VERT:
+            return '|'
+        else:
+            raise Exception("Unknown dir: %d" % self.dir)
 
 
 def ClosingDoor(closes_on):
@@ -102,7 +112,8 @@ def ClosingDoor(closes_on):
 
 
 class OpenDoor(Edge):
-    pass
+    def __str__(self):
+        return ' '
 
 
 def create_map():
@@ -134,18 +145,19 @@ def create_map():
             return OutsideMap
         return [c for c in connex_components if r in c][0]
 
-    connex_components = set.union(*(set(rooms[i]) for i in range(0)))
+    connex_components = {frozenset((rooms[i][j],)) for (i, j) in product(range(0, MAP_WIDTH),
+                                                                         range(0, MAP_HEIGHT))}
     connex_edges = {
         c: {
-            (list(c)[0], dir): _get_component(get_dir(list(c)[0], dir))
+            (list(c)[0], dir): _get_component(get_dir(get_dir(list(c)[0], dir), dir))
             for dir in DIRECTIONS
         }
         for c in connex_components
     }
 
     while len(connex_components) > 1:
-        c1 = random.choice(connex_components)
-        room, dir = random.choice(connex_edges)
+        c1 = random.choice(tuple(connex_components))
+        room, dir = random.choice(tuple(connex_edges[c1].keys()))
 
         edge = get_dir(room, dir)
         adj_room = get_dir(edge, dir)
@@ -161,7 +173,7 @@ def create_map():
 
         connex_components.remove(c1)
         connex_components.remove(c2)
-        merged_c = set.union(c1, c2)
+        merged_c = frozenset.union(c1, c2)
         connex_components.add(merged_c)
 
         for c in connex_edges:
@@ -170,5 +182,24 @@ def create_map():
                     connex_edges[c][room, dir] = merged_c
 
         connex_edges[merged_c] = {
-            (room, dir): cc for ((room, dir), cc) in chain(connex_edges[c1].items(), connex_edges[c2].items())
+            (room, dir): cc
+            for ((room, dir), cc) in chain(connex_edges[c1].items(), connex_edges[c2].items())
+            if cc != merged_c
         }
+
+def print_map():
+    for j in range(0, MAP_HEIGHT):
+        for i in range(0, MAP_WIDTH):
+            stdout.write('+')
+            stdout.write('%s' % h_edges[i][j])
+        stdout.write('+\n')
+
+        for i in range(0, MAP_WIDTH):
+            stdout.write('%s' % v_edges[i][j])
+            stdout.write('%s' % rooms[i][j])
+        stdout.write('%s\n' % v_edges[MAP_WIDTH][j])
+
+    for i in range(0, MAP_WIDTH):
+        stdout.write('+')
+        stdout.write('%s' % h_edges[i][MAP_HEIGHT])
+    stdout.write('+\n')

@@ -3,6 +3,7 @@ import sys
 
 from pygame.locals import *
 
+import map
 from player import Player
 
 pg.init()
@@ -14,6 +15,8 @@ pg.display.set_caption("Popo")
 # all_sprites = pg.sprite.Group()
 
 player = Player()
+map.create_map()
+map.print_map()
 
 # all_sprites.add(player)
 clock = pg.time.Clock()
