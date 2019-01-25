@@ -30,6 +30,4 @@ def sprite_sheet(file, sprite_size, pos=(0, 0)) -> [Surface]:
         sprt_rect_y += len_sprt_y
         sprt_rect_x = 0
 
-    print(sprites)
-
     return sprites

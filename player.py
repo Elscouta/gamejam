@@ -1,5 +1,6 @@
-import pygame as pg
 import os
+
+import pygame as pg
 
 from utils import sprite_sheet
 
@@ -9,7 +10,7 @@ class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.current_horizontal_cycle = 0
-        self.sprites = sprite_sheet(os.path.join('assets', 'children.png'), (45, 50))
+        self.sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
         self.image = self.sprites[0][0]
         self.x = 0
         self.y = 0
@@ -21,7 +22,6 @@ class Player(pg.sprite.Sprite):
         self.current_horizontal_cycle += 1
         if self.current_horizontal_cycle == 3:
             self.current_horizontal_cycle = 0
-
 
     def handle_keys(self):
         key = pg.key.get_pressed()

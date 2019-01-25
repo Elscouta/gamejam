@@ -9,7 +9,7 @@ pg.init()
 
 screen = pg.display.set_mode((640, 480))
 
-pg.display.set_caption("My First Game")
+pg.display.set_caption("Popo")
 
 # all_sprites = pg.sprite.Group()
 
