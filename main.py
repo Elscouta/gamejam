@@ -16,6 +16,8 @@ pg.display.set_caption("Popo")
 player = Player()
 
 # all_sprites.add(player)
+clock = pg.time.Clock()
+
 
 while True:
     for event in pg.event.get():
@@ -29,4 +31,6 @@ while True:
     player.draw(screen)
 
     pg.display.update()
+    clock.tick(60)
+    pg.display.set_caption(str(clock.get_fps()))
     # all_sprites.draw(DISPLAYSURF)
