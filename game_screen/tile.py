@@ -1,7 +1,8 @@
 from pygame.rect import Rect
 
-from game_screen.asset import NW_CORNER, N_WALL, NE_CORNER, W_WALL, FLOOR, E_WALL, SW_CORNER, S_WALL, SE_CORNER, N_DOOR, W_DOOR, \
-    E_DOOR, S_DOOR, N_DOORWAY, W_DOORWAY, E_DOORWAY, S_DOORWAY
+from game_screen.asset import NW_CORNER, N_WALL, NE_CORNER, W_WALL, FLOOR, E_WALL, SW_CORNER, S_WALL, SE_CORNER, N_DOOR, \
+    W_DOOR, \
+    E_DOOR, S_DOOR, N_DOORWAY, W_DOORWAY, E_DOORWAY, S_DOORWAY, BEDSIDE_LAMP, BED_TOP, BED_BOTTOM
 from config import WALL_WIDTH, TILE_WIDTH, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_CROP_BOTTOM, \
     PLAYER_CROP_TOP, PLAYER_CROP_RIGHT, PLAYER_CROP_LEFT
 
@@ -55,3 +56,7 @@ SouthWall = Tile(S_WALL, False, False, True, False)
 SouthClosedDoor = Tile(S_DOOR, False, False, True, False)
 SouthOpenDoor = Tile(S_DOORWAY, False, False, False, False)
 SouthEastCorner = Tile(SE_CORNER, False, True, True, False)
+BedsideLamp = Tile(BEDSIDE_LAMP, True, True, True, True)
+BedTop = Tile(BED_TOP, True, True, True, True)
+BedBottom = Tile(BED_BOTTOM, True, False, False, False)
+

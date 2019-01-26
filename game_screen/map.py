@@ -5,15 +5,15 @@ from sys import stdout
 from pygame import Surface
 from pygame.rect import Rect
 
-from game_screen import lightning
 from game_screen.asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
-from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, \
+from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, \
+    NorthEastCorner, \
     EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner, NorthClosedDoor, SouthClosedDoor, WestClosedDoor, \
-    EastClosedDoor
+    EastClosedDoor, BedsideLamp, BedTop, BedBottom
 
 rooms = None
 h_edges = None
@@ -23,6 +23,7 @@ final_room = None
 map_surface = None
 closing_door_sequence = None
 closed_door_count = 10
+light_sources = []
 
 OutsideMap = object()
 
@@ -107,6 +108,20 @@ class Bedroom(Room):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.distance_to_bed = 0
+
+    def get_tile(self, tile_x, tile_y):
+        if (tile_x, tile_y) == (1, 0):
+            return BedsideLamp
+        elif (tile_x, tile_y) == (2, 0):
+            return BedTop
+        elif (tile_x, tile_y) == (2, 1):
+            return BedBottom
+        else:
+            return super().get_tile(tile_x, tile_y)
+
+    def get_initial_position(self):
+        return (self.x * ROOM_WIDTH * TILE_WIDTH + int(2.2 * TILE_WIDTH),
+                self.y * ROOM_HEIGHT * TILE_HEIGHT + int(1.8 * TILE_HEIGHT))
 
     def __str__(self):
         return 'B'
@@ -446,9 +461,8 @@ def init():
     _fill_initial_surface()
 
 
-def draw(screen, player_x, player_y):
-    lightning_area = lightning.get_player_light_area(player_x, player_y)
-    screen.blit(map_surface, to_screen_coords(lightning_area), area=lightning_area)
+def draw(screen, light_mask):
+    screen.blit(map_surface, to_screen_coords(0, 0))
 
 
 def close_door():
