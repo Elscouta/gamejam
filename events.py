@@ -1,4 +1,4 @@
-from pygame.constants import USEREVENT, NUMEVENTS
+from pygame.constants import USEREVENT
 from pygame.time import set_timer
 
 _events = set()

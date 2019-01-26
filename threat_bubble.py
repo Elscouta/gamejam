@@ -28,7 +28,7 @@ class ThreatBubble(pg.sprite.Sprite):
         self.image = pg.transform.scale(self.image, (75, 50))
 
     def draw(self, screen: pg.Surface):
-        import map
+        from game_screen import map
 
         x, y = map.to_screen_coords(self.monster_position[0], self.monster_position[1])
         cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2

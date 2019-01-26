@@ -5,12 +5,12 @@ from sys import stdout
 from pygame import Surface
 from pygame.rect import Rect
 
-import lightning
-from asset import get_sprite
+from game_screen import lightning
+from game_screen.asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
-    SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
+    SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
-from tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, \
+from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, \
     EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner, NorthClosedDoor, SouthClosedDoor, WestClosedDoor, \
     EastClosedDoor
@@ -474,7 +474,7 @@ def random_point():
 
 
 def to_screen_coords(*args):
-    import player
+    from game_screen import player
 
     if isinstance(args[0], Rect):
         return args[0].move(SCREEN_WIDTH / 2 - player.get_x(),

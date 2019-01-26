@@ -35,10 +35,12 @@ def init():
     _tilesheets[MAP_TILESHEET] = sprite_sheet(os.path.join('assets', 'tilesetHouse.png'), (TILE_WIDTH, TILE_HEIGHT))
     _tilesheets[LIGHT_TILESHEET] = sprite_sheet(os.path.join('assets', 'halo.png'), (640, 640))
 
+
 def get_sprite(sprite_id):
     return _tilesheets[sprite_id[0]][sprite_id[1]][sprite_id[2]]
+
 
 @functools.lru_cache(maxsize=64)
 def get_light_halo(radius):
     big_light_halo = get_sprite(HALO)
-    return transform.scale(big_light_halo, (2*radius, 2*radius))
+    return transform.scale(big_light_halo, (2 * radius, 2 * radius))

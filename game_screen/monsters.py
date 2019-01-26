@@ -1,9 +1,6 @@
-import random
-
 from config import MIN_MONSTER_DISTANCE
 from events import schedule_event, clear_event
-import map
-import player
+from game_screen import player, map
 from threat_bubble import ThreatBubble
 from utils import distance
 
@@ -66,4 +63,4 @@ def draw_all(screen):
 
 def init():
     schedule_event(spawn, 5 * 10, oneshot=False)
-    schedule_event(map.close_door, 45*10, oneshot=False)
+    schedule_event(map.close_door, 45 * 10, oneshot=False)

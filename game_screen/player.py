@@ -5,12 +5,11 @@ from pygame.color import Color
 from pygame.constants import BLEND_RGBA_MIN, SRCALPHA
 from pygame.surface import Surface
 
-import lightning
-import map
+from game_screen import map, lightning
 
 import pygame as pg
 
-from asset import get_light_halo
+from game_screen.asset import get_light_halo
 from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH
 from utils import sprite_sheet, distance
 
@@ -65,7 +64,7 @@ def _valid_position(x, y):
     rel_x = x % TILE_WIDTH
     rel_y = y % TILE_HEIGHT
 
-    return not any(map.get_tile(x+dx, y+dy).is_collision(rel_x-dx, rel_y-dy)
+    return not any(map.get_tile(x + dx, y + dy).is_collision(rel_x - dx, rel_y - dy)
                    for (dx, dy) in product({0, TILE_WIDTH}, {0, TILE_HEIGHT}))
 
 
