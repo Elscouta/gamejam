@@ -4,7 +4,7 @@ import pygame
 import random
 
 from config import MIN_MONSTER_DISTANCE, MONSTER_SPEED, MONSTER_MOVE_INTERVAL, MONSTER_ANNOUNCE_INTERVAL, \
-    MONSTER_RANDOM_WALK, MONSTER_WARNING_INTERVAL, MONSTER_SPAWN_INTERVAL
+    MONSTER_RANDOM_WALK, MONSTER_WARNING_INTERVAL, MONSTER_SPAWN_INTERVAL, TILE_WIDTH
 from events import schedule_event, clear_event
 from game_screen import player, map
 from game_screen.asset import get_sprite, WARNING
@@ -30,7 +30,7 @@ class Monster:
 
         self._events.add(schedule_event(self.announce_itself, MONSTER_ANNOUNCE_INTERVAL*10, oneshot=False))
         self._events.add(schedule_event(self.move, MONSTER_MOVE_INTERVAL*10, oneshot=False))
-        self._events.add(schedule_event(self.switch_warning_sign, MONSTER_WARNING_INTERVAL*10 + 1, oneshot=False))
+        self._events.add(schedule_event(self.switch_warning_sign, MONSTER_WARNING_INTERVAL, oneshot=False))
 
         self.threat_bubble = None
         self.warning_sign_active = 0
@@ -43,7 +43,8 @@ class Monster:
         self.announce_itself()
 
     def switch_warning_sign(self):
-        self.warning_sign_active = self.warning_sign_active + 1 % 3
+        if random.random() < 0.7:
+            self.warning_sign_active = (self.warning_sign_active + 1) % 3
 
     def destroy(self):
         for e in self._events:
@@ -54,22 +55,31 @@ class Monster:
         if self.threat_bubble:
             self.threat_bubble.draw(screen)
 
-        if self.warning_sign_active == 2:
+        if (self.get_distance_to_player() / TILE_WIDTH < 4 * self.warning_sign_active + 2):
             screen.blit(get_sprite(WARNING), map.to_screen_coords(self.x, self.y))
 
-    def move(self):
+    def get_distance_to_player(self):
         from game_screen import player
 
         px, py = player.get_x(), player.get_y()
-        dst = distance((px, py), (self.x, self.y))
+        return distance((px, py), (self.x, self.y))
+
+    def move(self):
+        px, py = player.get_x(), player.get_y()
+        dst = self.get_distance_to_player()
 
         ms = MONSTER_MOVE_INTERVAL * MONSTER_SPEED
 
-        dx = int(ms * (self.x - px) / dst)
-        dy = int(ms * (self.y - py) / dst)
+        dx = int(ms * (px - self.x) / dst)
+        dy = int(ms * (py - self.y) / dst)
 
-        self.x += dx + int(random.uniform(-ms * MONSTER_RANDOM_WALK, ms * MONSTER_RANDOM_WALK))
-        self.y += dy + int(random.uniform(-ms * MONSTER_RANDOM_WALK, ms * MONSTER_RANDOM_WALK))
+        while True:
+            self.x += dx + int(random.uniform(-ms * MONSTER_RANDOM_WALK, ms * MONSTER_RANDOM_WALK))
+            self.y += dy + int(random.uniform(-ms * MONSTER_RANDOM_WALK, ms * MONSTER_RANDOM_WALK))
+            if self.get_distance_to_player() > 2 * TILE_WIDTH:
+                break
+            else:
+                ms = ms*2 + 1
 
     def announce_itself(self):
         self.threat_bubble = ThreatBubble((self.x, self.y))
