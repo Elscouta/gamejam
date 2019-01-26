@@ -13,7 +13,7 @@ class GameScreen(Screen):
         map.print()
         monsters.init()
 
-    def draw(self, screen: Surface, clock: pg.time.Clock, player_speed: int):
+    def draw(self, screen: Surface, clock: pg.time.Clock, player_speed: int) -> bool:
         player.handle_keys()
 
         # Draw stuff
@@ -27,3 +27,5 @@ class GameScreen(Screen):
         if fps > 0:
             player_speed = player_speed * (60 / fps)
             pg.display.set_caption(f"FPS: {clock.get_fps()}, player speed : {player_speed}")
+
+        return False
