@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pygame as pg
@@ -21,6 +22,9 @@ def get_next_screen(current_displayed_screen: Screen) -> Screen:
 
 
 pg.init()
+
+pg.mixer_music.load(os.path.join('assets', 'music.ogg'))
+pg.mixer_music.play(-1)
 
 currentDisplayScreen: Screen = None
 
