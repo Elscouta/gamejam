@@ -1,4 +1,3 @@
-import math
 import os
 from itertools import product
 
@@ -13,7 +12,7 @@ import pygame as pg
 
 from asset import get_light_halo
 from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH
-from utils import sprite_sheet
+from utils import sprite_sheet, distance
 
 
 class _state:
@@ -48,9 +47,7 @@ def draw(screen):
             continue
 
         edge_x, edge_y = edge.get_pixel_coords()
-        dx = _state.x + PLAYER_WIDTH / 2 - edge_x
-        dy = _state.y + PLAYER_HEIGHT / 2 - edge_y
-        edge_dist = math.sqrt(dx*dx + dy*dy)
+        edge_dist = distance((edge_x, edge_y), (_state.x + PLAYER_WIDTH // 2, _state.y + PLAYER_HEIGHT // 2))
 
         if edge_dist > lightning.lightning_radius:
             continue

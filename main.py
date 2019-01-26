@@ -8,7 +8,7 @@ import gamelogic
 import map
 from config import SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_SPEED
 import player
-from threat_bubble import ThreatBubble
+import events
 
 pg.init()
 
@@ -19,20 +19,24 @@ pg.display.set_caption("Popo")
 # all_sprites = pg.sprite.Group()
 asset.init()
 
+events.init()
 player.init()
 map.init()
 map.print()
+gamelogic.init()
 
 # all_sprites.add(player)
 clock = pg.time.Clock()
 
-# threat_bubble = ThreatBubble((10, 50))
 
 while True:
     for event in pg.event.get():
         if event.type == QUIT:
             pg.quit()
             sys.exit()
+
+        if event.type == USEREVENT:
+            events.tick()
 
     screen.fill((0, 0, 0))
 
@@ -41,10 +45,9 @@ while True:
     # Draw stuff
     map.draw(screen, player.get_x(), player.get_y())
     player.draw(screen)
-    threat_bubble.draw(screen)
 
-    pg.display.flip()
     gamelogic.tick()
+    pg.display.update()
     clock.tick(60)
     fps = clock.get_fps()
     if fps > 0:

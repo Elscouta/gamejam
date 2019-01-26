@@ -232,7 +232,9 @@ class ClosedDoor(Edge):
 def ClosingDoor(closing_priority):
 
     class _ClosingDoor(Edge):
-        passable = False
+        @property
+        def passable(self):
+            return self.visible_state.passable
 
         @property
         def visible_state(self):
@@ -465,6 +467,10 @@ def get_tile(player_x, player_y):
     tile_x = (player_x % (ROOM_WIDTH * TILE_WIDTH)) // TILE_WIDTH
     tile_y = (player_y % (ROOM_HEIGHT * TILE_HEIGHT)) // TILE_HEIGHT
     return room.get_tile(tile_x, tile_y)
+
+
+def random_point():
+    return random.randint(0, MAP_WIDTH*ROOM_WIDTH*TILE_WIDTH), random.randint(0, MAP_HEIGHT*ROOM_HEIGHT*TILE_HEIGHT)
 
 
 def to_screen_coords(*args):
