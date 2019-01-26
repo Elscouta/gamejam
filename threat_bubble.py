@@ -56,5 +56,8 @@ class ThreatBubble(pg.sprite.Sprite):
             x = int(k * (x - cx) + cx)
 
         screen.blit(self.image, (x, y))
-        screen.blit(self.burger, ((x + self.rect.w / 2) - ((self.burger.get_size()[0] / 2) - 5),
+        offset = -5
+        if self.rect.x < SCREEN_WIDTH // 2:
+            offset = 5
+        screen.blit(self.burger, ((x + self.rect.w / 2) - ((self.burger.get_size()[0] / 2) + offset),
                                   (y + self.rect.h / 2) - (self.burger.get_size()[1] / 2)))
