@@ -19,6 +19,10 @@ def get_dir(obj, dir):
     return getattr(obj, dir)()
 
 
+def _outside_map(x, y):
+    return x < 0 or x >= MAP_WIDTH or y < 0 or y >= MAP_HEIGHT
+
+
 class Room:
     TYPE_NORMAL = 0
     TYPE_BED = 1
@@ -44,6 +48,9 @@ class Room:
     def __str__(self):
         return '.'
 
+    def __repr__(self):
+        return "Room(%s, %s)"
+
 
 class Edge:
     HORIZ = 1
@@ -55,6 +62,9 @@ class Edge:
         self.dir = dir
 
     def replace(self, edge_class):
+        assert self.dir == Edge.HORIZ or 0 < self.x < MAP_WIDTH
+        assert self.dir == Edge.VERT or 0 < self.y < MAP_HEIGHT
+
         if self.dir == Edge.HORIZ:
             target = h_edges
         elif self.dir == Edge.VERT:
@@ -66,31 +76,27 @@ class Edge:
 
     def north(self):
         assert self.dir == Edge.HORIZ
-        try:
-            return rooms[self.x][self.y - 1]
-        except IndexError:
+        if _outside_map(self.x, self.y-1):
             return OutsideMap
+        return rooms[self.x][self.y-1]
 
     def south(self):
         assert self.dir == Edge.HORIZ
-        try:
-            return rooms[self.x][self.y]
-        except IndexError:
+        if _outside_map(self.x, self.y):
             return OutsideMap
+        return rooms[self.x][self.y]
 
     def east(self):
         assert self.dir == Edge.VERT
-        try:
-            return rooms[self.x][self.y]
-        except IndexError:
+        if _outside_map(self.x, self.y):
             return OutsideMap
+        return rooms[self.x][self.y]
 
     def west(self):
         assert self.dir == Edge.VERT
-        try:
-            return rooms[self.x - 1][self.y]
-        except IndexError:
+        if _outside_map(self.x-1, self.y):
             return OutsideMap
+        return rooms[self.x-1][self.y]
 
 
 class Wall(Edge):
@@ -187,16 +193,6 @@ def create_map():
             for ((room, dir), cc) in chain(connex_edges[c1].items(), connex_edges[c2].items())
             if cc != merged_c
         }
-
-
-def draw_map():
-    for j in range(0, MAP_HEIGHT):
-        for i in range(0, MAP_WIDTH):
-            pass
-        for i in range(0, MAP_WIDTH):
-            pass
-    for i in range(0, MAP_WIDTH):
-        pass
 
 
 def print_map():
