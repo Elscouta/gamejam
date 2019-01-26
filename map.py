@@ -9,10 +9,11 @@ rooms = None
 h_edges = None
 v_edges = None
 
-
 OutsideMap = object()
 
 DIRECTIONS = ['north', 'east', 'south', 'west']
+
+
 def get_dir(obj, dir):
     assert dir in DIRECTIONS
     return getattr(obj, dir)()
@@ -32,10 +33,10 @@ class Room:
         return h_edges[self.x][self.y]
 
     def south(self):
-        return h_edges[self.x][self.y+1]
+        return h_edges[self.x][self.y + 1]
 
     def east(self):
-        return v_edges[self.x+1][self.y]
+        return v_edges[self.x + 1][self.y]
 
     def west(self):
         return v_edges[self.x][self.y]
@@ -66,7 +67,7 @@ class Edge:
     def north(self):
         assert self.dir == Edge.HORIZ
         try:
-            return rooms[self.x][self.y-1]
+            return rooms[self.x][self.y - 1]
         except IndexError:
             return OutsideMap
 
@@ -87,7 +88,7 @@ class Edge:
     def west(self):
         assert self.dir == Edge.VERT
         try:
-            return rooms[self.x-1][self.y]
+            return rooms[self.x - 1][self.y]
         except IndexError:
             return OutsideMap
 
@@ -128,7 +129,7 @@ def create_map():
 
     h_edges = [
         [
-            Wall(i, j, dir=Edge.HORIZ) for j in range(0, MAP_HEIGHT+1)
+            Wall(i, j, dir=Edge.HORIZ) for j in range(0, MAP_HEIGHT + 1)
         ]
         for i in range(0, MAP_WIDTH)
     ]
@@ -137,7 +138,7 @@ def create_map():
         [
             Wall(i, j, dir=Edge.VERT) for j in range(0, MAP_HEIGHT)
         ]
-        for i in range(0, MAP_WIDTH+1)
+        for i in range(0, MAP_WIDTH + 1)
     ]
 
     def _get_component(r):
@@ -186,6 +187,17 @@ def create_map():
             for ((room, dir), cc) in chain(connex_edges[c1].items(), connex_edges[c2].items())
             if cc != merged_c
         }
+
+
+def draw_map():
+    for j in range(0, MAP_HEIGHT):
+        for i in range(0, MAP_WIDTH):
+            pass
+        for i in range(0, MAP_WIDTH):
+            pass
+    for i in range(0, MAP_WIDTH):
+        pass
+
 
 def print_map():
     for j in range(0, MAP_HEIGHT):
