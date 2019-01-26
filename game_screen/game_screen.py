@@ -2,9 +2,10 @@ import pygame as pg
 from pygame import Surface
 
 from game_screen import player, monsters, map, asset
+from screen import Screen
 
 
-class GameScreen:
+class GameScreen(Screen):
     def __init__(self):
         asset.init()
         player.init()
