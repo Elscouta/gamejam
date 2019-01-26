@@ -10,8 +10,10 @@ from asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
-from tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, EastOpenDoor, \
-    SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner
+from tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, \
+    EastOpenDoor, \
+    SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner, NorthClosedDoor, SouthClosedDoor, WestClosedDoor, \
+    EastClosedDoor
 
 rooms = None
 h_edges = None
@@ -20,7 +22,7 @@ initial_room = None
 final_room = None
 map_surface = None
 closing_door_sequence = None
-closed_door_count = 0
+closed_door_count = 10
 
 OutsideMap = object()
 
@@ -169,7 +171,6 @@ class Edge:
 
 
 class Wall(Edge):
-
     passable = False
 
     def __str__(self):
@@ -193,23 +194,56 @@ class Wall(Edge):
                 return EastWall
 
 
+class ClosedDoor(Edge):
+    passable = False
+
+    def get_tile(self, bottom=None, right=None):
+        if self.dir == Edge.HORIZ:
+            assert bottom is not None
+
+            if bottom:
+                return NorthClosedDoor
+            else:
+                return SouthClosedDoor
+
+        else:
+            assert right is not None
+
+            if right:
+                return WestClosedDoor
+            else:
+                return EastClosedDoor
+
+    def __str__(self):
+        if self.dir == Edge.HORIZ:
+            return '-'
+        elif self.dir == Edge.VERT:
+            return '|'
+        else:
+            raise Exception("Unknown dir: %d" % self.dir)
+
+
 def ClosingDoor(closing_priority):
 
     class _ClosingDoor(Edge):
-
         passable = False
+
+        @property
+        def visible_state(self):
+            if self.closing_priority >= closed_door_count:
+                return OpenDoor(self.x, self.y, self.dir)
+            else:
+                return ClosedDoor(self.x, self.y, self.dir)
+
+        def get_tile(self, *args, **kwargs):
+            return self.visible_state.get_tile(*args, **kwargs)
 
         def __init__(self, x, y, dir):
             super().__init__(x, y, dir)
             self.closing_priority = closing_priority
 
         def __str__(self):
-            if self.dir == Edge.HORIZ:
-                return '-'
-            elif self.dir == Edge.VERT:
-                return '|'
-            else:
-                raise Exception("Unknown dir: %d" % self.dir)
+            return str(self.visible_state)
 
     return _ClosingDoor
 
@@ -399,9 +433,9 @@ def _create():
 
 def init():
     _create()
-    _fill_initial_surface()
     _determine_initial_room()
     _bfs_scan_creation()
+    _fill_initial_surface()
 
 
 def draw(screen, player_x, player_y):
@@ -416,6 +450,7 @@ def draw(screen, player_x, player_y):
 def close_door():
     global closed_door_count
     closed_door_count += 1
+    _fill_initial_surface()
 
 
 def get_room(coord_x, coord_y):

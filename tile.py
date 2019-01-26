@@ -1,7 +1,7 @@
 from pygame.rect import Rect
 
 from asset import NW_CORNER, N_WALL, NE_CORNER, W_WALL, FLOOR, E_WALL, SW_CORNER, S_WALL, SE_CORNER, N_DOOR, W_DOOR, \
-    E_DOOR, S_DOOR
+    E_DOOR, S_DOOR, N_DOORWAY, W_DOORWAY, E_DOORWAY, S_DOORWAY
 from config import WALL_WIDTH, TILE_WIDTH, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_CROP_BOTTOM, \
     PLAYER_CROP_TOP, PLAYER_CROP_RIGHT, PLAYER_CROP_LEFT
 
@@ -40,14 +40,18 @@ class Tile:
 
 NorthWestCorner = Tile(NW_CORNER, True, False, False, True)
 NorthWall = Tile(N_WALL, True, False, False, False)
-NorthOpenDoor = Tile(N_DOOR, False, False, False, False)
+NorthClosedDoor = Tile(N_DOOR, True, False, False, False)
+NorthOpenDoor = Tile(N_DOORWAY, False, False, False, False)
 NorthEastCorner = Tile(NE_CORNER, True, True, False, False)
 WestWall = Tile(W_WALL, False, False, False, True)
-WestOpenDoor = Tile(W_DOOR, False, False, False, False)
+WestClosedDoor = Tile(W_DOOR, False, False, False, True)
+WestOpenDoor = Tile(W_DOORWAY, False, False, False, False)
 Floor = Tile(FLOOR, False, False, False, False)
 EastWall = Tile(E_WALL, False, True, False, False)
-EastOpenDoor = Tile(E_DOOR, False, False, False, False)
+EastClosedDoor = Tile(E_DOOR, False, True, False, False)
+EastOpenDoor = Tile(E_DOORWAY, False, False, False, False)
 SouthWestCorner = Tile(SW_CORNER, False, False, True, True)
 SouthWall = Tile(S_WALL, False, False, True, False)
-SouthOpenDoor = Tile(S_DOOR, False, False, False, False)
+SouthClosedDoor = Tile(S_DOOR, False, False, True, False)
+SouthOpenDoor = Tile(S_DOORWAY, False, False, False, False)
 SouthEastCorner = Tile(SE_CORNER, False, True, True, False)
