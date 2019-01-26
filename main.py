@@ -4,6 +4,7 @@ import sys
 from pygame.locals import *
 
 import asset
+import gamelogic
 import map
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from player import Player
@@ -38,6 +39,7 @@ while True:
     player.draw()
 
     pg.display.update()
+    gamelogic.tick()
     clock.tick(60)
     pg.display.set_caption(str(clock.get_fps()))
     # all_sprites.draw(DISPLAYSURF)

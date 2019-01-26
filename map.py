@@ -3,11 +3,13 @@ from itertools import chain, product
 from sys import stdout
 
 from pygame import Surface
+from pygame.rect import Rect
 
+import gamelogic
 from asset import NW_CORNER, SW_CORNER, W_DOOR, W_WALL, N_DOOR, S_DOOR, FLOOR, SE_CORNER, E_DOOR, NE_CORNER, E_WALL, \
     S_WALL, N_WALL, get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
-    SCREEN_HEIGHT
+    SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT
 from tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner
 
@@ -57,23 +59,23 @@ class Room:
             if tile_y == 0:
                 return NorthWestCorner
             elif tile_y == DOOR_POSITION:
-                return WestOpenDoor
+                return v_edges[self.x][self.y].get_tile(right=True)
             elif tile_y == ROOM_HEIGHT - 1:
                 return SouthWestCorner
             else:
                 return WestWall
         elif tile_x == DOOR_POSITION:
             if tile_y == 0:
-                return NorthOpenDoor
+                return h_edges[self.x][self.y].get_tile(bottom=True)
             elif tile_y == ROOM_HEIGHT - 1:
-                return SouthOpenDoor
+                return h_edges[self.x][self.y+1].get_tile(bottom=False)
             else:
                 return Floor
         elif tile_x == ROOM_WIDTH - 1:
             if tile_y == 0:
                 return NorthEastCorner
             elif tile_y == DOOR_POSITION:
-                return EastOpenDoor
+                return v_edges[self.x+1][self.y].get_tile(right=False)
             elif tile_y == ROOM_HEIGHT - 1:
                 return SouthEastCorner
             else:
@@ -149,6 +151,23 @@ class Wall(Edge):
         else:
             raise Exception("Unknown dir: %d" % self.dir)
 
+    def get_tile(self, bottom=None, right=None):
+        if self.dir == Edge.HORIZ:
+            assert bottom is not None
+
+            if bottom:
+                return NorthWall
+            else:
+                return SouthWall
+
+        else:
+            assert right is not None
+
+            if right:
+                return WestWall
+            else:
+                return EastWall
+
 
 def ClosingDoor(closes_on):
     class _ClosingDoor(Edge):
@@ -162,6 +181,23 @@ def ClosingDoor(closes_on):
 class OpenDoor(Edge):
     def __str__(self):
         return ' '
+
+    def get_tile(self, bottom=None, right=None):
+        if self.dir == Edge.HORIZ:
+            assert bottom is not None
+
+            if bottom:
+                return NorthOpenDoor
+            else:
+                return SouthOpenDoor
+
+        else:
+            assert right is not None
+
+            if right:
+                return WestOpenDoor
+            else:
+                return EastOpenDoor
 
 
 def _fill_initial_surface():
@@ -262,7 +298,12 @@ def init():
 
 
 def draw(screen, player_x, player_y):
-    screen.blit(map_surface, (SCREEN_WIDTH / 2 - player_x, SCREEN_HEIGHT / 2 - player_y))
+    radius = gamelogic.lightning_radius
+    screen.blit(map_surface,
+                Rect(SCREEN_WIDTH / 2 + PLAYER_WIDTH / 2 - radius,
+                     SCREEN_HEIGHT / 2 + PLAYER_HEIGHT / 2 - radius,
+                     2*radius, 2*radius),
+                area=gamelogic.get_player_light_area(player_x, player_y))
 
 
 def get_tile(player_x, player_y):

@@ -1,19 +1,21 @@
 import os
 from itertools import product
 
+import gamelogic
 import map
 
 import pygame as pg
 
-from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT
+from asset import get_light_halo
+from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH
 from utils import sprite_sheet
 
 
 class Player(pg.sprite.Sprite):
 
-    def __init__(self, surface: pg.Surface):
+    def __init__(self, screen: pg.Surface):
         super().__init__()
-        self.surface = surface
+        self.screen = screen
         self.current_horizontal_cycle = 0
         self.sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
         self.image = self.sprites[0][0]
@@ -21,7 +23,11 @@ class Player(pg.sprite.Sprite):
         self.y = 75
 
     def draw(self):
-        self.surface.blit(self.image, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+        player_x = SCREEN_WIDTH / 2
+        player_y = SCREEN_HEIGHT / 2
+        self.screen.blit(self.image, (player_x, player_y))
+        self.screen.blit(get_light_halo(gamelogic.lightning_radius),
+                         gamelogic.get_player_light_area(player_x, player_y))
 
     def valid_position(self, x, y):
         rel_x = x % TILE_WIDTH
