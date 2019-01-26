@@ -13,7 +13,7 @@ from title_screen.title_screen import TitleScreen
 
 def get_next_screen(current_displayed_screen: Screen) -> Screen:
     if not current_displayed_screen:
-        return GameScreen()
+        return TitleScreen()
     if type(current_displayed_screen) is TitleScreen:
         return GameScreen()
     if type(current_displayed_screen) is GameScreen:
@@ -24,7 +24,7 @@ pg.init()
 
 currentDisplayScreen: Screen = None
 
-screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #, FULLSCREEN)
 
 pg.display.set_caption("Poop for Glory!")
 
@@ -37,6 +37,8 @@ while True:
         if event.type == QUIT or event.type == KEYDOWN and event.key == K_ESCAPE:
             pg.quit()
             sys.exit()
+        if type(currentDisplayScreen) == TitleScreen and event.type == KEYDOWN and event.key == K_RETURN:
+            currentDisplayScreen = get_next_screen(currentDisplayScreen)
 
         if event.type == USEREVENT:
             events.tick()
@@ -45,3 +47,5 @@ while True:
 
     if not currentDisplayScreen or currentDisplayScreen.draw(screen, clock, PLAYER_SPEED):
         currentDisplayScreen = get_next_screen(currentDisplayScreen)
+
+    pg.display.update()

@@ -27,7 +27,6 @@ class GameScreen(Screen):
 
         monsters.draw_all(screen)
 
-        pg.display.update()
         clock.tick(60)
         fps = clock.get_fps()
         if fps > 0:
