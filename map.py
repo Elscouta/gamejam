@@ -145,6 +145,12 @@ class Edge:
 
         target[self.x][self.y] = edge_class(self.x, self.y, self.dir)
 
+    def get_pixel_coords(self):
+        if self.dir == Edge.HORIZ:
+            return int((self.x + 0.5) * ROOM_WIDTH * TILE_WIDTH), self.y * ROOM_HEIGHT * TILE_HEIGHT
+        else:
+            return self.x * ROOM_WIDTH * TILE_WIDTH, int((self.y + 0.5) * ROOM_HEIGHT * TILE_HEIGHT)
+
     def north(self):
         assert self.dir == Edge.HORIZ
         if _outside_map(self.x, self.y-1):
@@ -439,12 +445,8 @@ def init():
 
 
 def draw(screen, player_x, player_y):
-    radius = lightning.lightning_radius
-    screen.blit(map_surface,
-                Rect(SCREEN_WIDTH / 2 + PLAYER_WIDTH / 2 - radius,
-                     SCREEN_HEIGHT / 2 + PLAYER_HEIGHT / 2 - radius,
-                     2*radius, 2*radius),
-                area=lightning.get_player_light_area(player_x, player_y))
+    lightning_area = lightning.get_player_light_area(player_x, player_y)
+    screen.blit(map_surface, to_screen_coords(lightning_area), area=lightning_area)
 
 
 def close_door():
@@ -454,15 +456,26 @@ def close_door():
 
 
 def get_room(coord_x, coord_y):
-    return (coord_x // (ROOM_WIDTH * TILE_WIDTH), coord_y // (ROOM_HEIGHT * TILE_HEIGHT))
+    return rooms[int(coord_x) // (ROOM_WIDTH * TILE_WIDTH)][int(coord_y) // (ROOM_HEIGHT * TILE_HEIGHT)]
 
 
 def get_tile(player_x, player_y):
-    room_x, room_y = get_room(player_x, player_y)
+    room = get_room(player_x, player_y)
 
     tile_x = (player_x % (ROOM_WIDTH * TILE_WIDTH)) // TILE_WIDTH
     tile_y = (player_y % (ROOM_HEIGHT * TILE_HEIGHT)) // TILE_HEIGHT
-    return rooms[room_x][room_y].get_tile(tile_x, tile_y)
+    return room.get_tile(tile_x, tile_y)
+
+
+def to_screen_coords(*args):
+    import player
+
+    if isinstance(args[0], Rect):
+        return args[0].move(SCREEN_WIDTH / 2 - player.get_x(),
+                            SCREEN_HEIGHT / 2 - player.get_y())
+
+    assert len(args) == 2
+    return args[0] + (SCREEN_WIDTH / 2 - player.get_x()), args[1] + SCREEN_HEIGHT / 2 - player.get_y()
 
 
 def print():

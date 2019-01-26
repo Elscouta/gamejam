@@ -1,5 +1,10 @@
+import math
 import os
 from itertools import product
+
+from pygame.color import Color
+from pygame.constants import BLEND_RGBA_MIN, SRCALPHA
+from pygame.surface import Surface
 
 import lightning
 import map
@@ -21,11 +26,43 @@ sprites = None
 
 
 def draw(screen):
-    player_x = SCREEN_WIDTH / 2
-    player_y = SCREEN_HEIGHT / 2
-    screen.blit(_state.image, (player_x, player_y))
-    screen.blit(get_light_halo(lightning.lightning_radius),
-                     lightning.get_player_light_area(player_x, player_y))
+    player_screen_x = SCREEN_WIDTH / 2
+    player_screen_y = SCREEN_HEIGHT / 2
+    player_room = map.get_room(_state.x, _state.y)
+    screen.blit(_state.image, (player_screen_x, player_screen_y))
+
+    screen_mask = Surface((screen.get_width(), screen.get_height()), flags=SRCALPHA)
+    screen_mask.fill(Color(0, 0, 0))
+
+    halo = get_light_halo(lightning.lightning_radius)
+    clipped_halo = lightning.clip_light_halo_by_room(halo, player_room,
+                                                     _state.x + PLAYER_WIDTH // 2,
+                                                     _state.y + PLAYER_HEIGHT // 2,
+                                                     lightning.lightning_radius)
+    screen_mask.blit(clipped_halo, map.to_screen_coords(lightning.get_player_light_area(_state.x, _state.y)),
+                     special_flags=BLEND_RGBA_MIN)
+
+    for d in map.DIRECTIONS:
+        edge = map.get_dir(player_room, d)
+        if not edge.passable:
+            continue
+
+        edge_x, edge_y = edge.get_pixel_coords()
+        dx = _state.x + PLAYER_WIDTH / 2 - edge_x
+        dy = _state.y + PLAYER_HEIGHT / 2 - edge_y
+        edge_dist = math.sqrt(dx*dx + dy*dy)
+
+        if edge_dist > lightning.lightning_radius:
+            continue
+
+        secondary_radius = lightning.lightning_radius - edge_dist
+        secondary_halo = get_light_halo(int(secondary_radius))
+        clipped_halo = lightning.clip_light_halo_by_room(secondary_halo, map.get_dir(edge, d),
+                                                         edge_x, edge_y, secondary_radius)
+        screen_mask.blit(clipped_halo, map.to_screen_coords(lightning.get_light_area(edge_x, edge_y, secondary_radius)),
+                         special_flags=BLEND_RGBA_MIN)
+
+    screen.blit(screen_mask, (0, 0))
 
 def _valid_position(x, y):
     rel_x = x % TILE_WIDTH
