@@ -25,6 +25,7 @@ pg.init()
 
 pg.mixer_music.load(os.path.join('assets', 'music.ogg'))
 pg.mixer_music.play(-1)
+pg.mixer_music.set_volume(0.5)
 
 currentDisplayScreen: Screen = None
 
