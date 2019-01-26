@@ -14,7 +14,7 @@ pg.display.set_caption("Popo")
 
 # all_sprites = pg.sprite.Group()
 
-player = Player()
+player = Player(screen)
 map.create_map()
 map.print_map()
 
@@ -31,7 +31,7 @@ while True:
     screen.fill((0, 0, 0))
 
     player.handle_keys()
-    player.draw(screen)
+    player.draw()
 
     pg.display.update()
     clock.tick(60)

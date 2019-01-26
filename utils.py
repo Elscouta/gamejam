@@ -1,8 +1,9 @@
 import pygame
 from pygame.surface import Surface
+from typing import List
 
 
-def sprite_sheet(file, sprite_size, pos=(0, 0)) -> [Surface]:
+def sprite_sheet(file, sprite_size, pos=(0, 0)) -> List[List[Surface]]:
     sheet = pygame.image.load(file).convert_alpha()  # Load the sheet
     len_sprt_x, len_sprt_y = sprite_size
     sprt_rect_x, sprt_rect_y = pos  # where to find first sprite on sheet
