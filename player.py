@@ -1,4 +1,6 @@
 import os
+from itertools import product
+
 import map
 
 import pygame as pg
@@ -15,26 +17,18 @@ class Player(pg.sprite.Sprite):
         self.current_horizontal_cycle = 0
         self.sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
         self.image = self.sprites[0][0]
-        self.x = 15
-        self.y = 15
+        self.x = 75
+        self.y = 75
 
     def draw(self):
         self.surface.blit(self.image, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
     def valid_position(self, x, y):
-        if map.get_tile(x, y).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
-            return False
+        rel_x = x % TILE_WIDTH
+        rel_y = y % TILE_HEIGHT
 
-        if map.get_tile(x+TILE_WIDTH, y).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
-            return False
-
-        if map.get_tile(x, y+TILE_HEIGHT).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
-            return False
-
-        if map.get_tile(x+TILE_WIDTH, y+TILE_HEIGHT).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
-            return False
-
-        return True
+        return not any(map.get_tile(x+dx, y+dy).is_collision(rel_x-dx, rel_y-dy)
+                       for (dx, dy) in product({0, TILE_WIDTH}, {0, TILE_HEIGHT}))
 
     def increment_cycle(self):
         self.current_horizontal_cycle += 1

@@ -1,5 +1,6 @@
 import os
 
+from config import TILE_WIDTH, TILE_HEIGHT
 from utils import sprite_sheet
 
 MAP_TILESHEET = 0
@@ -22,7 +23,7 @@ _tilesheets = {}
 
 
 def init():
-    _tilesheets[MAP_TILESHEET] = sprite_sheet(os.path.join('assets', 'tilesetHouse.png'), (32, 32))
+    _tilesheets[MAP_TILESHEET] = sprite_sheet(os.path.join('assets', 'tilesetHouse.png'), (TILE_WIDTH, TILE_HEIGHT))
 
 
 def get_sprite(sprite_id):

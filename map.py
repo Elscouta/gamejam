@@ -8,7 +8,7 @@ from asset import NW_CORNER, SW_CORNER, W_DOOR, W_WALL, N_DOOR, S_DOOR, FLOOR, S
     S_WALL, N_WALL, get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT
-from tile import WestWall, SouthWestCorner, WestDoor, NorthDoor, SouthDoor, Floor, NorthEastCorner, EastDoor, \
+from tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner
 
 rooms = None
@@ -57,23 +57,23 @@ class Room:
             if tile_y == 0:
                 return NorthWestCorner
             elif tile_y == DOOR_POSITION:
-                return WestDoor
+                return WestOpenDoor
             elif tile_y == ROOM_HEIGHT - 1:
                 return SouthWestCorner
             else:
                 return WestWall
         elif tile_x == DOOR_POSITION:
             if tile_y == 0:
-                return NorthDoor
+                return NorthOpenDoor
             elif tile_y == ROOM_HEIGHT - 1:
-                return SouthDoor
+                return SouthOpenDoor
             else:
                 return Floor
         elif tile_x == ROOM_WIDTH - 1:
             if tile_y == 0:
                 return NorthEastCorner
             elif tile_y == DOOR_POSITION:
-                return EastDoor
+                return EastOpenDoor
             elif tile_y == ROOM_HEIGHT - 1:
                 return SouthEastCorner
             else:
