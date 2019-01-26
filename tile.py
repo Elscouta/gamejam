@@ -37,29 +37,6 @@ class Tile:
 
         return False
 
-    def is_collision_ur(self, x, y):
-        if self.top_wall and y < WALL_WIDTH - PLAYER_CROP_TOP:
-            return True
-
-        if self.right_wall and x > TILE_WIDTH - PLAYER_WIDTH + PLAYER_CROP_RIGHT - WALL_WIDTH:
-            return True
-
-        if self.left_wall and x < WALL_WIDTH - PLAYER_CROP_LEFT:
-            return True
-
-        return False
-
-    def is_collision_bl(self, x, y):
-        if self.right_wall and y > TILE_WIDTH - PLAYER_HEIGHT + PLAYER_CROP_BOTTOM and x > TILE_WIDTH - PLAYER_WIDTH + PLAYER_CROP_RIGHT - WALL_WIDTH:
-            return True
-
-        if self.left_wall and y > TILE_WIDTH - PLAYER_HEIGHT + PLAYER_CROP_BOTTOM and x < WALL_WIDTH - PLAYER_CROP_LEFT:
-            return True
-
-        if self.bottom_wall and y > 2 * TILE_WIDTH - PLAYER_HEIGHT + PLAYER_CROP_BOTTOM - WALL_WIDTH:
-            return True
-
-        return False
 
 NorthWestCorner = Tile(NW_CORNER, True, False, False, True)
 NorthWall = Tile(N_WALL, True, False, False, False)

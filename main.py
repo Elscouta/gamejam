@@ -7,7 +7,7 @@ import asset
 import gamelogic
 import map
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
-from player import Player
+import player
 
 pg.init()
 
@@ -18,7 +18,7 @@ pg.display.set_caption("Popo")
 # all_sprites = pg.sprite.Group()
 asset.init()
 
-player = Player(screen)
+player.init()
 map.init()
 map.print()
 
@@ -35,8 +35,8 @@ while True:
     screen.fill((0, 0, 0))
 
     player.handle_keys()
-    map.draw(screen, player.x, player.y)
-    player.draw()
+    map.draw(screen, player.get_x(), player.get_y())
+    player.draw(screen)
 
     pg.display.update()
     gamelogic.tick()

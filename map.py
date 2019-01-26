@@ -5,18 +5,22 @@ from sys import stdout
 from pygame import Surface
 from pygame.rect import Rect
 
-import gamelogic
-from asset import NW_CORNER, SW_CORNER, W_DOOR, W_WALL, N_DOOR, S_DOOR, FLOOR, SE_CORNER, E_DOOR, NE_CORNER, E_WALL, \
-    S_WALL, N_WALL, get_sprite
+import lightning
+from asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
-    SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT
+    SCREEN_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
+    MAX_CLOSING_DOORS
 from tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, NorthEastCorner, EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner
 
 rooms = None
 h_edges = None
 v_edges = None
+initial_room = None
+final_room = None
 map_surface = None
+closing_door_sequence = None
+closed_door_count = 0
 
 OutsideMap = object()
 
@@ -33,14 +37,16 @@ def _outside_map(x, y):
 
 
 class Room:
-    TYPE_NORMAL = 0
-    TYPE_BED = 1
-    TYPE_WC = 2
-
     def __init__(self, x, y):
-        self.type = Room.TYPE_NORMAL
         self.x = x
         self.y = y
+        self.distance_to_bed = None
+
+    def replace(self, class_name):
+        dtb = self.distance_to_bed
+        rooms[self.x][self.y] = class_name(self.x, self.y)
+        if dtb is not None:
+            rooms[self.x][self.y].distance_to_bed = dtb
 
     def north(self):
         return h_edges[self.x][self.y]
@@ -92,7 +98,27 @@ class Room:
         return '.'
 
     def __repr__(self):
-        return "Room(%s, %s)"
+        return "Room(%s, %s)" % (self.x, self.y)
+
+
+class Bedroom(Room):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.distance_to_bed = 0
+
+    def __str__(self):
+        return 'B'
+
+    def __repr__(self):
+        return "Bedroom(%s, %s)" % (self.x, self.y)
+
+
+class WC(Room):
+    def __str__(self):
+        return 'W'
+
+    def __repr__(self):
+        return "WC(%s, %s)" % (self.x, self.y)
 
 
 class Edge:
@@ -143,13 +169,11 @@ class Edge:
 
 
 class Wall(Edge):
+
+    passable = False
+
     def __str__(self):
-        if self.dir == Edge.HORIZ:
-            return '-'
-        elif self.dir == Edge.VERT:
-            return '|'
-        else:
-            raise Exception("Unknown dir: %d" % self.dir)
+        return '+'
 
     def get_tile(self, bottom=None, right=None):
         if self.dir == Edge.HORIZ:
@@ -169,16 +193,31 @@ class Wall(Edge):
                 return EastWall
 
 
-def ClosingDoor(closes_on):
+def ClosingDoor(closing_priority):
+
     class _ClosingDoor(Edge):
+
+        passable = False
+
         def __init__(self, x, y, dir):
             super().__init__(x, y, dir)
-            self.closes_on = closes_on
+            self.closing_priority = closing_priority
+
+        def __str__(self):
+            if self.dir == Edge.HORIZ:
+                return '-'
+            elif self.dir == Edge.VERT:
+                return '|'
+            else:
+                raise Exception("Unknown dir: %d" % self.dir)
 
     return _ClosingDoor
 
 
 class OpenDoor(Edge):
+
+    passable = True
+
     def __str__(self):
         return ' '
 
@@ -200,6 +239,10 @@ class OpenDoor(Edge):
                 return EastOpenDoor
 
 
+class MapCreationFailed(Exception):
+    pass
+
+
 def _fill_initial_surface():
     global map_surface
 
@@ -218,6 +261,68 @@ def _fill_initial_surface():
                     map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
             room_y += ROOM_HEIGHT * TILE_HEIGHT
         room_x += ROOM_WIDTH * TILE_WIDTH
+
+
+def _determine_initial_room():
+    global initial_room
+
+    x = random.choice(tuple(range(0, MAP_WIDTH)))
+    y = random.choice(tuple(range(0, MAP_HEIGHT)))
+
+    rooms[x][y].replace(Bedroom)
+    initial_room = rooms[x][y]
+
+
+def _bfs_scan_creation():
+    global closing_door_sequence, final_room
+    closing_door_sequence = []
+
+    wc_candidates = []
+
+    # 1 -- Breadth First Search
+    queue = []
+    visited = set()
+    queue.append(initial_room)
+
+    while queue:
+        room, queue = queue[0], queue[1:]
+        visited.add(room)
+
+        if MIN_DISTANCE_WC_BED <= room.distance_to_bed <= MAX_DISTANCE_WC_BED:
+            wc_candidates.append(room)
+
+        for d in DIRECTIONS:
+            edge = get_dir(room, d)
+            adj_room = get_dir(edge, d)
+
+            if adj_room == OutsideMap:
+                continue
+
+            if not edge.passable:
+                closing_door_sequence.append(edge)
+            else:
+                if adj_room not in visited:
+                    queue.append(adj_room)
+                    visited.add(adj_room)
+                    adj_room.distance_to_bed = room.distance_to_bed + 1
+
+    # 2 -- Determine final room (WC Room)
+    if not wc_candidates:
+        raise MapCreationFailed('No candidates for final room.')
+    final_room = random.choice(wc_candidates)
+    final_room.replace(WC)
+
+    # 3 -- Determine the closing door sequence
+    closing_doors_count = len(closing_door_sequence)
+    for _ in range(0, CLOSING_DOORS_SWAPS):
+        i = random.choice(tuple(range(0, closing_doors_count)))
+        j = random.choice(tuple(range(0, closing_doors_count)))
+
+        if i != j:
+            closing_door_sequence[i], closing_door_sequence[j] = closing_door_sequence[j], closing_door_sequence[i]
+
+    for i in range(0, min(closing_doors_count, MAX_CLOSING_DOORS)):
+        closing_door_sequence[i].replace(ClosingDoor(i))
 
 
 def _create():
@@ -295,20 +400,30 @@ def _create():
 def init():
     _create()
     _fill_initial_surface()
+    _determine_initial_room()
+    _bfs_scan_creation()
 
 
 def draw(screen, player_x, player_y):
-    radius = gamelogic.lightning_radius
+    radius = lightning.lightning_radius
     screen.blit(map_surface,
                 Rect(SCREEN_WIDTH / 2 + PLAYER_WIDTH / 2 - radius,
                      SCREEN_HEIGHT / 2 + PLAYER_HEIGHT / 2 - radius,
                      2*radius, 2*radius),
-                area=gamelogic.get_player_light_area(player_x, player_y))
+                area=lightning.get_player_light_area(player_x, player_y))
+
+
+def close_door():
+    global closed_door_count
+    closed_door_count += 1
+
+
+def get_room(coord_x, coord_y):
+    return (coord_x // (ROOM_WIDTH * TILE_WIDTH), coord_y // (ROOM_HEIGHT * TILE_HEIGHT))
 
 
 def get_tile(player_x, player_y):
-    room_x = player_x // (ROOM_WIDTH * TILE_WIDTH)
-    room_y = player_y // (ROOM_HEIGHT * TILE_HEIGHT)
+    room_x, room_y = get_room(player_x, player_y)
 
     tile_x = (player_x % (ROOM_WIDTH * TILE_WIDTH)) // TILE_WIDTH
     tile_y = (player_y % (ROOM_HEIGHT * TILE_HEIGHT)) // TILE_HEIGHT
