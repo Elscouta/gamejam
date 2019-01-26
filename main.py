@@ -12,7 +12,7 @@ from threat_bubble import ThreatBubble
 
 pg.init()
 
-screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), HWSURFACE | DOUBLEBUF)
+screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 pg.display.set_caption("Popo")
 
@@ -26,7 +26,7 @@ map.print()
 # all_sprites.add(player)
 clock = pg.time.Clock()
 
-threat_bubble = ThreatBubble((10, 50))
+# threat_bubble = ThreatBubble((10, 50))
 
 while True:
     for event in pg.event.get():
@@ -43,7 +43,7 @@ while True:
     player.draw(screen)
     threat_bubble.draw(screen)
 
-    pg.display.update()
+    pg.display.flip()
     gamelogic.tick()
     clock.tick(60)
     fps = clock.get_fps()
