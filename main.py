@@ -26,7 +26,7 @@ currentDisplayScreen: Screen = None
 
 screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FULLSCREEN)
 
-pg.display.set_caption("Popo")
+pg.display.set_caption("Poop for Glory!")
 
 events.init()
 
