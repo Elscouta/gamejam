@@ -9,6 +9,7 @@ from game_screen.asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
+from game_screen.lighting import draw_light_source
 from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, \
     NorthEastCorner, \
     EastOpenDoor, \
@@ -23,7 +24,7 @@ final_room = None
 map_surface = None
 closing_door_sequence = None
 closed_door_count = 10
-light_sources = []
+light_sources = None
 
 OutsideMap = object()
 
@@ -454,15 +455,27 @@ def _create():
         }
 
 
+def _position_light_sources():
+    global light_sources
+
+    light_sources = []
+    light_sources.append((initial_room.x * ROOM_WIDTH * TILE_WIDTH + 96,
+                          initial_room.y * ROOM_HEIGHT * TILE_HEIGHT + 36,
+                          128))
+
+
 def init():
     _create()
     _determine_initial_room()
     _bfs_scan_creation()
     _fill_initial_surface()
+    _position_light_sources()
 
 
 def draw(screen, light_mask):
     screen.blit(map_surface, to_screen_coords(0, 0))
+    for source_x, source_y, source_radius in light_sources:
+        draw_light_source(light_mask, source_x, source_y, source_radius)
 
 
 def close_door():
