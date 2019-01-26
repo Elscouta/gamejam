@@ -4,7 +4,7 @@ import sys
 from pygame.locals import *
 
 import asset
-import gamelogic
+import monsters
 import map
 from config import SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_SPEED
 import player
@@ -23,7 +23,7 @@ events.init()
 player.init()
 map.init()
 map.print()
-gamelogic.init()
+monsters.init()
 
 # all_sprites.add(player)
 clock = pg.time.Clock()
@@ -45,8 +45,8 @@ while True:
     # Draw stuff
     map.draw(screen, player.get_x(), player.get_y())
     player.draw(screen)
+    monsters.draw_all(screen)
 
-    gamelogic.tick()
     pg.display.update()
     clock.tick(60)
     fps = clock.get_fps()

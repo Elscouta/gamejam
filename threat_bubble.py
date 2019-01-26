@@ -28,6 +28,33 @@ class ThreatBubble(pg.sprite.Sprite):
         self.image = pg.transform.scale(self.image, (75, 50))
 
     def draw(self, screen: pg.Surface):
-        screen.blit(self.image, self.monster_position)
-        screen.blit(self.burger, ((self.monster_position[0] + self.rect.w / 2) - ((self.burger.get_size()[0] / 2) - 5),
-                                  (self.monster_position[1] + self.rect.h / 2) - (self.burger.get_size()[1] / 2)))
+        import map
+
+        x, y = map.to_screen_coords(self.monster_position[0], self.monster_position[1])
+        cx, cy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        minx, maxx = self.rect.w // 2, SCREEN_WIDTH - 3 * self.rect.w // 2
+        miny, maxy = self.rect.h // 2, SCREEN_HEIGHT - 3 * self.rect.h // 2
+
+        if x < minx:
+            k = (minx - cx) / (x - cx)
+            x = minx
+            y = int(k * (y - cy) + cy)
+
+        if y < miny:
+            k = (miny - cy) / (y - cy)
+            y = miny
+            x = int(k * (x - cx) + cx)
+
+        if x > maxx:
+            k = (maxx - cx) / (x - cx)
+            x = maxx
+            y = int(k * (y - cy) + cy)
+
+        if y > maxy:
+            k = (maxy - cy) / (y - cy)
+            y = maxy
+            x = int(k * (x - cx) + cx)
+
+        screen.blit(self.image, (x, y))
+        screen.blit(self.burger, ((x + self.rect.w / 2) - ((self.burger.get_size()[0] / 2) - 5),
+                                  (y + self.rect.h / 2) - (self.burger.get_size()[1] / 2)))
