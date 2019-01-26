@@ -8,10 +8,11 @@ import gamelogic
 import map
 from config import SCREEN_HEIGHT, SCREEN_WIDTH
 import player
+from utils import display_text_bubble
 
 pg.init()
 
-screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 pg.display.set_caption("Popo")
 
@@ -37,6 +38,8 @@ while True:
     player.handle_keys()
     map.draw(screen, player.get_x(), player.get_y())
     player.draw(screen)
+
+    display_text_bubble(screen, None, (64, 56), (40, 40))
 
     pg.display.update()
     gamelogic.tick()
