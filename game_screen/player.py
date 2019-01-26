@@ -2,6 +2,7 @@ import os
 from itertools import product
 
 from pygame import time
+from pygame.mixer import SoundType
 
 from game_screen import map, lighting
 
@@ -25,7 +26,7 @@ class _state:
     last_tick = None
 
 sprites = None
-
+footstep_sound: SoundType = None
 
 def draw(screen, light_mask):
     player_screen_x = SCREEN_WIDTH / 2
@@ -96,7 +97,7 @@ def handle_keys():
 
         if moving:
             increment_cycle()
-
+            footstep_sound.play()
 
 
 def get_x():
@@ -109,7 +110,9 @@ def get_y():
 
 def init():
     global sprites
-
+    global footstep_sound
+    footstep_sound = pg.mixer.Sound(os.path.join('assets', 'sfx_footsteps.wav'))
+    footstep_sound.set_volume(0.1)
     _state.x, _state.y = map.initial_room.get_initial_position()
     _state.last_tick = time.get_ticks()
 
