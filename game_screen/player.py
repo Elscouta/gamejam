@@ -1,18 +1,19 @@
 import os
 from itertools import product
 
-from pygame.color import Color
-from pygame.constants import BLEND_RGBA_MIN, SRCALPHA
-from pygame.surface import Surface
+from pygame import time
 
 from game_screen import map, lighting
 
 import pygame as pg
 
-from game_screen.asset import get_light_halo
-from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH
+from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH, \
+    PLAYER_FRAME_ROTATION
 from game_screen.lighting import draw_light_source
-from utils import sprite_sheet, distance
+from utils import sprite_sheet
+
+
+PLAYER_FRAME_LENGTH = PLAYER_FRAME_ROTATION // 3
 
 
 class _state:
@@ -20,6 +21,8 @@ class _state:
     y = None
     current_horizontal_cycle = None
     image = None
+    remaining_millipixels = 0
+    last_tick = None
 
 sprites = None
 
@@ -40,43 +43,60 @@ def _valid_position(x, y):
                    for (dx, dy) in product({0, TILE_WIDTH}, {0, TILE_HEIGHT}))
 
 
-def increment_cycle(update_cycle: bool):
-    if update_cycle:
-        _state.current_horizontal_cycle += 1
-        if _state.current_horizontal_cycle == 3:
-            _state.current_horizontal_cycle = 0
-        return False
-    return True
+def increment_cycle():
+    _state.current_horizontal_cycle = (_state.current_horizontal_cycle + 1) % PLAYER_FRAME_ROTATION
 
 
 def handle_keys():
     key = pg.key.get_pressed()
     dist = 1
 
-    update_cycle = True
+    new_tick = time.get_ticks()
+    tick_since_last = new_tick - _state.last_tick
+    _state.last_tick = new_tick
 
-    for _ in range(0, PLAYER_SPEED):
+    millipixels = (tick_since_last * PLAYER_SPEED) + _state.remaining_millipixels
+    pixel_moves = millipixels // 1000
+    _state.remaining_millipixels = pixel_moves % 1000
+
+
+    for _ in range(0, pixel_moves):
         new_x = _state.x
         new_y = _state.y
+        moving = False
 
         if key[pg.K_DOWN]:
             new_y = new_y + dist
-            _state.image = sprites[0][_state.current_horizontal_cycle]
+            _state.image = sprites[0][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            moving = True
         elif key[pg.K_UP]:
             new_y = new_y - dist
-            _state.image = sprites[3][_state.current_horizontal_cycle]
-        if key[pg.K_RIGHT]:
-            new_x = new_x + dist
-            _state.image = sprites[2][_state.current_horizontal_cycle]
-        elif key[pg.K_LEFT]:
-            new_x = new_x - dist
-            _state.image = sprites[1][_state.current_horizontal_cycle]
-
-        update_cycle = increment_cycle(update_cycle)
+            _state.image = sprites[3][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            moving = True
 
         if _valid_position(new_x, new_y):
             _state.x = new_x
             _state.y = new_y
+        else:
+            new_x = _state.x
+            new_y = _state.y
+
+        if key[pg.K_RIGHT]:
+            new_x = new_x + dist
+            _state.image = sprites[2][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            moving = True
+        elif key[pg.K_LEFT]:
+            new_x = new_x - dist
+            moving = True
+            _state.image = sprites[1][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+
+        if _valid_position(new_x, new_y):
+            _state.x = new_x
+            _state.y = new_y
+
+        if moving:
+            increment_cycle()
+
 
 
 def get_x():
@@ -91,6 +111,7 @@ def init():
     global sprites
 
     _state.x, _state.y = map.initial_room.get_initial_position()
+    _state.last_tick = time.get_ticks()
 
     sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
     _state.current_horizontal_cycle = 0
