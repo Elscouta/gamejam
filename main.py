@@ -3,20 +3,23 @@ import sys
 
 from pygame.locals import *
 
+import asset
 import map
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from player import Player
 
 pg.init()
 
-screen = pg.display.set_mode((640, 480))
+screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 pg.display.set_caption("Popo")
 
 # all_sprites = pg.sprite.Group()
+asset.init()
 
 player = Player(screen)
-map.create_map()
-map.print_map()
+map.init()
+map.print()
 
 # all_sprites.add(player)
 clock = pg.time.Clock()
@@ -31,6 +34,7 @@ while True:
     screen.fill((0, 0, 0))
 
     player.handle_keys()
+    map.draw(screen, player.x, player.y)
     player.draw()
 
     pg.display.update()

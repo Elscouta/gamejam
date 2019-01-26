@@ -1,7 +1,9 @@
 import os
+import map
 
 import pygame as pg
 
+from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT
 from utils import sprite_sheet
 
 
@@ -13,21 +15,26 @@ class Player(pg.sprite.Sprite):
         self.current_horizontal_cycle = 0
         self.sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
         self.image = self.sprites[0][0]
-        self.x = 0
-        self.y = 0
-
-    def check_for_constaints(self):
-        if self.y < 0:
-            self.y = 0
-        elif self.y + self.image.get_size()[1] > self.surface.get_size()[1]:
-            self.y = self.surface.get_size()[1] - self.image.get_size()[1]
-        if self.x < 0:
-            self.x = 0
-        elif self.x + self.image.get_size()[0] > self.surface.get_size()[0]:
-            self.x = self.surface.get_size()[0] - self.image.get_size()[0]
+        self.x = 15
+        self.y = 15
 
     def draw(self):
-        self.surface.blit(self.image, (self.x, self.y))
+        self.surface.blit(self.image, (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
+    def valid_position(self, x, y):
+        if map.get_tile(x, y).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
+            return False
+
+        if map.get_tile(x+TILE_WIDTH, y).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
+            return False
+
+        if map.get_tile(x, y+TILE_HEIGHT).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
+            return False
+
+        if map.get_tile(x+TILE_WIDTH, y+TILE_HEIGHT).is_collision(x % TILE_WIDTH, y % TILE_HEIGHT):
+            return False
+
+        return True
 
     def increment_cycle(self):
         self.current_horizontal_cycle += 1
@@ -36,25 +43,30 @@ class Player(pg.sprite.Sprite):
 
     def handle_keys(self):
         key = pg.key.get_pressed()
-        dist = 10
+        dist = 1
 
-        if key[pg.K_DOWN]:
-            self.y += dist
-            self.check_for_constaints()
-            self.image = self.sprites[0][self.current_horizontal_cycle]
-            self.increment_cycle()
-        elif key[pg.K_UP]:
-            self.y -= dist
-            self.check_for_constaints()
-            self.image = self.sprites[3][self.current_horizontal_cycle]
-            self.increment_cycle()
-        if key[pg.K_RIGHT]:
-            self.x += dist
-            self.check_for_constaints()
-            self.image = self.sprites[2][self.current_horizontal_cycle]
-            self.increment_cycle()
-        elif key[pg.K_LEFT]:
-            self.x -= dist
-            self.check_for_constaints()
-            self.image = self.sprites[1][self.current_horizontal_cycle]
-            self.increment_cycle()
+        for _ in range(0, PLAYER_SPEED):
+            new_x = self.x
+            new_y = self.y
+
+            if key[pg.K_DOWN]:
+                new_y = self.y + dist
+                self.image = self.sprites[0][self.current_horizontal_cycle]
+                self.increment_cycle()
+            elif key[pg.K_UP]:
+                new_y = self.y - dist
+                self.image = self.sprites[3][self.current_horizontal_cycle]
+                self.increment_cycle()
+            if key[pg.K_RIGHT]:
+                new_x = self.x + dist
+                self.image = self.sprites[2][self.current_horizontal_cycle]
+                self.increment_cycle()
+            elif key[pg.K_LEFT]:
+                new_x = self.x - dist
+                self.image = self.sprites[1][self.current_horizontal_cycle]
+                self.increment_cycle()
+
+            if self.valid_position(new_x, new_y):
+                self.x = new_x
+                self.y = new_y
+

@@ -2,12 +2,19 @@ import random
 from itertools import chain, product
 from sys import stdout
 
-MAP_WIDTH = 10
-MAP_HEIGHT = 10
+from pygame import Surface
+
+from asset import NW_CORNER, SW_CORNER, W_DOOR, W_WALL, N_DOOR, S_DOOR, FLOOR, SE_CORNER, E_DOOR, NE_CORNER, E_WALL, \
+    S_WALL, N_WALL, get_sprite
+from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
+    SCREEN_HEIGHT
+from tile import WestWall, SouthWestCorner, WestDoor, NorthDoor, SouthDoor, Floor, NorthEastCorner, EastDoor, \
+    SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner
 
 rooms = None
 h_edges = None
 v_edges = None
+map_surface = None
 
 OutsideMap = object()
 
@@ -44,6 +51,40 @@ class Room:
 
     def west(self):
         return v_edges[self.x][self.y]
+
+    def get_tile(self, tile_x, tile_y):
+        if tile_x == 0:
+            if tile_y == 0:
+                return NorthWestCorner
+            elif tile_y == DOOR_POSITION:
+                return WestDoor
+            elif tile_y == ROOM_HEIGHT - 1:
+                return SouthWestCorner
+            else:
+                return WestWall
+        elif tile_x == DOOR_POSITION:
+            if tile_y == 0:
+                return NorthDoor
+            elif tile_y == ROOM_HEIGHT - 1:
+                return SouthDoor
+            else:
+                return Floor
+        elif tile_x == ROOM_WIDTH - 1:
+            if tile_y == 0:
+                return NorthEastCorner
+            elif tile_y == DOOR_POSITION:
+                return EastDoor
+            elif tile_y == ROOM_HEIGHT - 1:
+                return SouthEastCorner
+            else:
+                return EastWall
+        else:
+            if tile_y == 0:
+                return NorthWall
+            elif tile_y == ROOM_HEIGHT - 1:
+                return SouthWall
+            else:
+                return Floor
 
     def __str__(self):
         return '.'
@@ -123,7 +164,27 @@ class OpenDoor(Edge):
         return ' '
 
 
-def create_map():
+def _fill_initial_surface():
+    global map_surface
+
+    map_surface = Surface((MAP_WIDTH*ROOM_WIDTH*TILE_WIDTH, MAP_HEIGHT*ROOM_HEIGHT*TILE_HEIGHT))
+    room_x = 0
+
+    for room_i in range (0, MAP_WIDTH):
+        room_y = 0
+
+        for room_j in range (0, MAP_HEIGHT):
+            for tile_i in range (0, ROOM_WIDTH):
+                for tile_j in range (0, ROOM_HEIGHT):
+                    sprite_id = rooms[room_i][room_j].get_tile(tile_i, tile_j).sprite_id
+                    x_coord = room_x + tile_i * TILE_WIDTH
+                    y_coord = room_y + tile_j * TILE_HEIGHT
+                    map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
+            room_y += ROOM_HEIGHT * TILE_HEIGHT
+        room_x += ROOM_WIDTH * TILE_WIDTH
+
+
+def _create():
     global rooms, h_edges, v_edges
 
     rooms = [
@@ -195,7 +256,25 @@ def create_map():
         }
 
 
-def print_map():
+def init():
+    _create()
+    _fill_initial_surface()
+
+
+def draw(screen, player_x, player_y):
+    screen.blit(map_surface, (SCREEN_WIDTH / 2 - player_x, SCREEN_HEIGHT / 2 - player_y))
+
+
+def get_tile(player_x, player_y):
+    room_x = player_x // (ROOM_WIDTH * TILE_WIDTH)
+    room_y = player_y // (ROOM_HEIGHT * TILE_HEIGHT)
+
+    tile_x = (player_x % (ROOM_WIDTH * TILE_WIDTH)) // TILE_WIDTH
+    tile_y = (player_y % (ROOM_HEIGHT * TILE_HEIGHT)) // TILE_HEIGHT
+    return rooms[room_x][room_y].get_tile(tile_x, tile_y)
+
+
+def print():
     for j in range(0, MAP_HEIGHT):
         for i in range(0, MAP_WIDTH):
             stdout.write('+')
