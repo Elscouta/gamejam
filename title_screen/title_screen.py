@@ -1,12 +1,12 @@
 import os
+from random import randint
 from typing import Optional
 
 import pygame as pg
-from pygame.constants import *
 
 from events import schedule_event, clear_event
 from screen import Screen, ScreenType
-from random import randint
+
 
 class TitleScreen(Screen):
     def __init__(self):

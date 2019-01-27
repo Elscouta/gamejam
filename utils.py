@@ -1,13 +1,36 @@
 import math
+import time
+from typing import List
 
 import pygame
 from pygame.surface import Surface
-from typing import List, Tuple
+
 
 def distance(pos1, pos2):
     dx = pos1[0] - pos2[0]
     dy = pos1[1] - pos2[1]
     return math.sqrt(dx * dx + dy * dy)
+
+
+def fade_in(screen: Surface, surface: Surface, fade_time_in_s):
+    starting_time = time.time()
+
+    while time.time() - starting_time <= fade_time_in_s:
+        state_time = time.time() - starting_time
+        # last_state_change = time.time() - state_time
+        alpha = 1.0 * state_time / fade_time_in_s
+        surface.set_alpha(alpha * 255)
+        screen.blit(surface, screen.get_rect())
+        pygame.display.update()
+
+
+def fade_out(screen: Surface, surface: Surface, fade_time_in_s, starting_time):
+    state_time = time.time() - starting_time
+    # last_state_change = time.time() - state_time
+    alpha = 1 - (1.0 * state_time / fade_time_in_s)
+    surface.set_alpha(alpha * 255)
+    screen.blit(surface, screen.get_rect())
+    pygame.display.update()
 
 
 def sprite_sheet(file, sprite_size, pos=(0, 0)) -> List[List[Surface]]:
@@ -17,7 +40,8 @@ def sprite_sheet(file, sprite_size, pos=(0, 0)) -> List[List[Surface]]:
 
     sheet_rect = sheet.get_rect()
 
-    sprites: List[List[Surface]] = [[0 for _ in range(0, int(sheet_rect.width / len_sprt_x))] for _ in range(0, int(sheet_rect.height / len_sprt_y))]
+    sprites: List[List[Surface]] = [[0 for _ in range(0, int(sheet_rect.width / len_sprt_x))] for _ in
+                                    range(0, int(sheet_rect.height / len_sprt_y))]
     current_row = 0
     current_column = 0
 
