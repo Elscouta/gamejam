@@ -1,3 +1,6 @@
+import pygame as pg
+import os
+
 from config import TILE_WIDTH
 from events import clear_event, schedule_event
 from game_screen import player, map, lighting, monsters
@@ -8,6 +11,7 @@ PHASE_SAFE = 1
 PHASE_RUNAWAY = 2
 
 closing_door_event = None
+currently_playing_music = 'music.ogg'
 
 
 class _state:
@@ -17,6 +21,18 @@ class _state:
 _triggers = []
 def trigger(cls):
     _triggers.append(cls())
+
+def change_music(new_song):
+    global currently_playing_music
+    if new_song != currently_playing_music:
+        pg.mixer_music.load(os.path.join('assets', new_song))
+        pg.mixer_music.play(-1)
+        pg.mixer_music.set_volume(1)
+        currently_playing_music = new_song
+
+
+def stop_music():
+    pg.mixer.music.stop()
 
 
 def init():
@@ -39,6 +55,19 @@ class GameOverEx(Exception):
 
 
 @trigger
+class Chased:
+    eligible_states = (PHASE_EXPLORATION,)
+
+    def condition(self):
+        return len(monsters._monsters) > 3
+
+    def action(self):
+        _state.phase = PHASE_RUNAWAY
+        change_music('escape8bit.wav')
+
+
+
+@trigger
 class BackToBed:
     eligible_states = (PHASE_EXPLORATION, PHASE_RUNAWAY)
 
@@ -48,6 +77,7 @@ class BackToBed:
 
     def action(self):
         _state.phase = PHASE_SAFE
+        change_music('music.ogg')
         lighting.player_lightning_radius = 6 * 64
         monsters.destroy_all()
         if closing_door_event:
@@ -79,5 +109,6 @@ class GameOver:
 
     def action(self):
         monsters.destroy_all()
+        stop_music()
         raise GameOverEx()
 
