@@ -1,3 +1,4 @@
+import functools
 import os
 from itertools import product
 
@@ -7,7 +8,7 @@ from pygame.mixer import SoundType
 
 import asset
 from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH, \
-    PLAYER_FRAME_ROTATION
+    PLAYER_FRAME_ROTATION, PAINT_POWER
 from game_screen import map, lighting
 from game_screen.lighting import draw_light_source
 
@@ -18,9 +19,13 @@ class _state:
     x = None
     y = None
     current_horizontal_cycle = None
+    current_paint_cycle = None
     image = None
     remaining_millipixels = 0
     last_tick = None
+    current_dir = 0
+    paint_level = None
+
 
 
 footstep_sound: SoundType = None
@@ -38,12 +43,34 @@ def _valid_position(x, y):
     rel_x = x % TILE_WIDTH
     rel_y = y % TILE_HEIGHT
 
-    return not any(map.get_tile(x + dx, y + dy).is_collision(rel_x - dx, rel_y - dy)
+    return not any(any(t.is_collision(rel_x - dx, rel_y - dy)
+                       for t in map.get_tile(x + dx, y + dy))
                    for (dx, dy) in product({0, TILE_WIDTH}, {0, TILE_HEIGHT}))
 
 
-def increment_cycle():
+def draw_footstep(sprite):
+    @functools.lru_cache(maxsize=None)
+    def get_rotated(sprite, cd):
+        return pg.transform.rotate(sprite, cd)
+
+    rotated_sprite = get_rotated(sprite, _state.current_dir)
+    rect = rotated_sprite.get_rect()
+    map.map_surface.blit(rotated_sprite, (_state.x - rect.x // 2,
+                                          _state.y + PLAYER_HEIGHT // 2 - rect.y // 2))
+
+
+def increment_cycles():
     _state.current_horizontal_cycle = (_state.current_horizontal_cycle + 1) % PLAYER_FRAME_ROTATION
+    _state.current_paint_cycle = (_state.current_paint_cycle + 1) % (24 * 2)
+    _state.paint_level = max(_state.paint_level - 1, 0)
+    if _state.current_paint_cycle == 0 and _state.paint_level:
+        draw_footstep(asset.get_sprite(asset.FOOTPRINT_LEFT))
+    if _state.current_paint_cycle == 24 and _state.paint_level:
+        draw_footstep(asset.get_sprite(asset.FOOTPRINT_RIGHT))
+
+
+def add_paint():
+    _state.paint_level = PAINT_POWER
 
 
 def handle_keys():
@@ -67,10 +94,14 @@ def handle_keys():
             new_y = new_y + dist
             _state.image = asset.get_player_sprites()[0][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
+            y_axis = -1
         elif key[pg.K_UP]:
             new_y = new_y - dist
             _state.image = asset.get_player_sprites()[3][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
+            y_axis = 1
+        else:
+            y_axis = 0
 
         if _valid_position(new_x, new_y):
             _state.x = new_x
@@ -83,17 +114,33 @@ def handle_keys():
             new_x = new_x + dist
             _state.image = asset.get_player_sprites()[2][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
+            x_axis = 1
         elif key[pg.K_LEFT]:
             new_x = new_x - dist
             moving = True
             _state.image = asset.get_player_sprites()[1][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            x_axis = -1
+        else:
+            x_axis = 0
+
+        _state.current_dir = {
+            (-1, 1): 45,
+            (-1, 0): 90,
+            (-1, -1): 135,
+            (0, -1): 180,
+            (1, -1): 225,
+            (1, 0): 270,
+            (1, 1): 315,
+            (0, 1): 360,
+            (0, 0): 0
+        }[x_axis, y_axis]
 
         if _valid_position(new_x, new_y):
             _state.x = new_x
             _state.y = new_y
 
         if moving:
-            increment_cycle()
+            increment_cycles()
             pg.mixer.Channel(1).play(footstep_sound)
 
 
@@ -116,4 +163,6 @@ def init():
     _state.x, _state.y = map.initial_room.get_initial_position()
     _state.last_tick = time.get_ticks()
     _state.current_horizontal_cycle = 0
+    _state.current_paint_cycle = 0
     _state.image = asset.get_player_sprites()[0][0]
+    _state.paint_level = 0

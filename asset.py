@@ -12,6 +12,8 @@ LIGHT_TILESHEET = 1
 FURNITURE_TILESHEET = 2
 OHNOES_TILESHEET = 3
 BUBBLE_TILESHEET = 4
+PAINT_TILESHEET = 5
+FOOTPRINT_TILESHEET = 6
 
 NW_CORNER = (MAP_TILESHEET, 0, 0)
 N_WALL = (MAP_TILESHEET, 0, 1)
@@ -43,6 +45,12 @@ BUBBLE_OF = (BUBBLE_TILESHEET, 0, 1)
 BUBBLE_FO = (BUBBLE_TILESHEET, 0, 2)
 BUBBLE_FF = (BUBBLE_TILESHEET, 0, 3)
 BURGER = (BUBBLE_TILESHEET, 0, 4)
+PAINT_NW = (PAINT_TILESHEET, 2, 0)
+PAINT_NE = (PAINT_TILESHEET, 2, 1)
+PAINT_SW = (PAINT_TILESHEET, 3, 0)
+PAINT_SE = (PAINT_TILESHEET, 3, 1)
+FOOTPRINT_LEFT = (FOOTPRINT_TILESHEET, 0, 0)
+FOOTPRINT_RIGHT = (FOOTPRINT_TILESHEET, 0, 1)
 
 _tilesheets = {}
 _player_sprites = None
@@ -70,7 +78,9 @@ def init():
     _tilesheets[LIGHT_TILESHEET] = sprite_sheet(os.path.join('assets', 'halo.png'), (640, 640))
     _tilesheets[FURNITURE_TILESHEET] = sprite_sheet(os.path.join('assets', 'house_objects.png'), (TILE_WIDTH, TILE_HEIGHT))
     _tilesheets[OHNOES_TILESHEET] = sprite_sheet(os.path.join('assets', 'ohnoes.png'), (2*TILE_WIDTH, 2*TILE_HEIGHT))
+    _tilesheets[PAINT_TILESHEET] = sprite_sheet(os.path.join('assets', 'ohnoes.png'), (TILE_WIDTH, TILE_HEIGHT))
     _tilesheets[BUBBLE_TILESHEET] = _load_bubble_tilesheet()
+    _tilesheets[FOOTPRINT_TILESHEET] = sprite_sheet(os.path.join('assets', 'footprints.png'), (32, 32))
     _player_sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
 
 

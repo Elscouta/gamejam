@@ -1,5 +1,7 @@
 import os
 import random
+from typing import List
+
 import pygame as pg
 from itertools import chain, product
 from sys import stdout
@@ -11,12 +13,13 @@ from asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
+from game_screen.furniture import Paint, Furniture
 from game_screen.lighting import draw_light_source
 from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, \
     NorthEastCorner, \
     EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner, NorthClosedDoor, SouthClosedDoor, WestClosedDoor, \
-    EastClosedDoor, BedsideLamp, BedTop, BedBottom
+    EastClosedDoor, BedsideLamp, BedTop, BedBottom, Tile
 
 rooms = None
 h_edges = None
@@ -48,6 +51,7 @@ class Room:
         self.x = x
         self.y = y
         self.distance_to_bed = None
+        self.furnitures: List[Furniture] = []
 
     def replace(self, class_name):
         dtb = self.distance_to_bed
@@ -72,39 +76,50 @@ class Room:
     def west(self):
         return v_edges[self.x][self.y]
 
-    def get_tile(self, tile_x, tile_y):
+    def add_furniture(self, furniture):
+        self.furnitures.append(furniture)
+
+    def get_tile(self, tile_x, tile_y) -> List[Tile]:
+        furniture_tiles = []
+        for f in self.furnitures:
+            if f.in_furniture(tile_x, tile_y):
+                furniture_tiles.append(f.get_tile(*f.room_coords_to_furniture_coords(tile_x, tile_y)))
+                break
+
         if tile_x == 0:
             if tile_y == 0:
-                return NorthWestCorner
+                base_tile = NorthWestCorner
             elif tile_y == DOOR_POSITION:
-                return v_edges[self.x][self.y].get_tile(right=True)
+                base_tile = v_edges[self.x][self.y].get_tile(right=True)
             elif tile_y == ROOM_HEIGHT - 1:
-                return SouthWestCorner
+                base_tile = SouthWestCorner
             else:
-                return WestWall
+                base_tile = WestWall
         elif tile_x == DOOR_POSITION:
             if tile_y == 0:
-                return h_edges[self.x][self.y].get_tile(bottom=True)
+                base_tile = h_edges[self.x][self.y].get_tile(bottom=True)
             elif tile_y == ROOM_HEIGHT - 1:
-                return h_edges[self.x][self.y+1].get_tile(bottom=False)
+                base_tile = h_edges[self.x][self.y+1].get_tile(bottom=False)
             else:
-                return Floor
+                base_tile = Floor
         elif tile_x == ROOM_WIDTH - 1:
             if tile_y == 0:
-                return NorthEastCorner
+                base_tile = NorthEastCorner
             elif tile_y == DOOR_POSITION:
-                return v_edges[self.x+1][self.y].get_tile(right=False)
+                base_tile = v_edges[self.x+1][self.y].get_tile(right=False)
             elif tile_y == ROOM_HEIGHT - 1:
-                return SouthEastCorner
+                base_tile = SouthEastCorner
             else:
-                return EastWall
+                base_tile = EastWall
         else:
             if tile_y == 0:
-                return NorthWall
+                base_tile = NorthWall
             elif tile_y == ROOM_HEIGHT - 1:
-                return SouthWall
+                base_tile = SouthWall
             else:
-                return Floor
+                base_tile = Floor
+
+        return [base_tile] + furniture_tiles
 
     def __str__(self):
         return '.'
@@ -120,11 +135,11 @@ class Bedroom(Room):
 
     def get_tile(self, tile_x, tile_y):
         if (tile_x, tile_y) == (1, 0):
-            return BedsideLamp
+            return [BedsideLamp]
         elif (tile_x, tile_y) == (2, 0):
-            return BedTop
+            return [BedTop]
         elif (tile_x, tile_y) == (2, 1):
-            return BedBottom
+            return [BedBottom]
         else:
             return super().get_tile(tile_x, tile_y)
 
@@ -321,10 +336,11 @@ def _fill_initial_surface():
         for room_j in range (0, MAP_HEIGHT):
             for tile_i in range (0, ROOM_WIDTH):
                 for tile_j in range (0, ROOM_HEIGHT):
-                    sprite_id = rooms[room_i][room_j].get_tile(tile_i, tile_j).sprite_id
                     x_coord = room_x + tile_i * TILE_WIDTH
                     y_coord = room_y + tile_j * TILE_HEIGHT
-                    map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
+                    for t in rooms[room_i][room_j].get_tile(tile_i, tile_j):
+                        map_surface.blit(get_sprite(t.sprite_id), (x_coord, y_coord))
+
             room_y += ROOM_HEIGHT * TILE_HEIGHT
         room_x += ROOM_WIDTH * TILE_WIDTH
 
@@ -344,6 +360,7 @@ def _bfs_scan_creation():
     closing_door_sequence = []
 
     wc_candidates = []
+    first_room_candidates = []
 
     # 1 -- Breadth First Search
     queue = []
@@ -356,6 +373,9 @@ def _bfs_scan_creation():
 
         if MIN_DISTANCE_WC_BED <= room.distance_to_bed <= MAX_DISTANCE_WC_BED:
             wc_candidates.append(room)
+
+        if room.distance_to_bed == 1:
+            first_room_candidates.append(room)
 
         for d in DIRECTIONS:
             edge = get_dir(room, d)
@@ -378,6 +398,10 @@ def _bfs_scan_creation():
     final_room = random.choice(wc_candidates)
     final_room.replace(WC)
     final_room = rooms[final_room.x][final_room.y]
+
+    # Add paint to the an adjacent room
+    adjacent_room = random.choice(first_room_candidates)
+    adjacent_room.add_furniture(Paint(1, 4))
 
     # 3 -- Determine the closing door sequence
     closing_doors_count = len(closing_door_sequence)
@@ -467,7 +491,7 @@ def _create():
         }
 
 
-def _position_light_sources():
+def _position_light_sources_and_furniture():
     global light_sources
 
     light_sources = []
@@ -482,7 +506,7 @@ def init():
     _determine_initial_room()
     _bfs_scan_creation()
     _fill_initial_surface()
-    _position_light_sources()
+    _position_light_sources_and_furniture()
 
 
 def draw(screen, light_mask):
@@ -503,7 +527,7 @@ def get_room(coord_x, coord_y):
     return rooms[int(coord_x) // (ROOM_WIDTH * TILE_WIDTH)][int(coord_y) // (ROOM_HEIGHT * TILE_HEIGHT)]
 
 
-def get_tile(player_x, player_y):
+def get_tile(player_x, player_y) -> List[Tile]:
     room = get_room(player_x, player_y)
 
     tile_x = (player_x % (ROOM_WIDTH * TILE_WIDTH)) // TILE_WIDTH
