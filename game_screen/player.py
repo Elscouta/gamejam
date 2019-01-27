@@ -33,7 +33,7 @@ def draw(screen, light_mask):
     player_screen_y = SCREEN_HEIGHT / 2
     screen.blit(_state.image, (player_screen_x, player_screen_y))
     draw_light_source(light_mask, _state.x + PLAYER_WIDTH // 2,
-                      _state.y + PLAYER_HEIGHT // 2, lighting.lightning_radius)
+                      _state.y + PLAYER_HEIGHT // 2, lighting.player_lightning_radius)
 
 
 def _valid_position(x, y):

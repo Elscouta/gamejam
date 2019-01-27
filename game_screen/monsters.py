@@ -6,8 +6,8 @@ import random
 from config import MIN_MONSTER_DISTANCE, MONSTER_SPEED, MONSTER_MOVE_INTERVAL, MONSTER_ANNOUNCE_INTERVAL, \
     MONSTER_RANDOM_WALK, MONSTER_WARNING_INTERVAL, MONSTER_SPAWN_INTERVAL, TILE_WIDTH
 from events import schedule_event, clear_event
-from game_screen import player, map
-from game_screen.asset import get_sprite, WARNING
+from game_screen import player, map, lighting
+from game_screen.asset import get_sprite, WARNING, get_shadow_halo
 from threat_bubble import ThreatBubble
 from utils import distance
 
@@ -28,7 +28,7 @@ class Monster:
         self.monster_sound = pygame.mixer.Sound(os.path.join('assets', 'sfx_scream.wav'))
         self.monster_sound.set_volume(0.1)
 
-        self._events.add(schedule_event(self.announce_itself, MONSTER_ANNOUNCE_INTERVAL*10, oneshot=False))
+        self._events.add(schedule_event(self.announce_itself, MONSTER_ANNOUNCE_INTERVAL*10 + 1, oneshot=False))
         self._events.add(schedule_event(self.move, MONSTER_MOVE_INTERVAL*10, oneshot=False))
         self._events.add(schedule_event(self.switch_warning_sign, MONSTER_WARNING_INTERVAL, oneshot=False))
 
@@ -44,7 +44,7 @@ class Monster:
 
     def switch_warning_sign(self):
         if random.random() < 0.7:
-            self.warning_sign_active = (self.warning_sign_active + 1) % 3
+            self.warning_sign_active = (self.warning_sign_active + 1) % 6
 
     def destroy(self):
         for e in self._events:
@@ -55,7 +55,10 @@ class Monster:
         if self.threat_bubble:
             self.threat_bubble.draw(screen)
 
-        if (self.get_distance_to_player() / TILE_WIDTH < 4 * self.warning_sign_active + 2):
+        shadow = get_shadow_halo(240)
+        screen.blit(shadow, map.to_screen_coords(self.x - 240, self.y - 240))
+
+        if (self.get_distance_to_player() / TILE_WIDTH < self.warning_sign_active):
             screen.blit(get_sprite(WARNING), map.to_screen_coords(self.x, self.y))
 
     def get_distance_to_player(self):
@@ -73,6 +76,7 @@ class Monster:
         dx = int(ms * (px - self.x) / dst)
         dy = int(ms * (py - self.y) / dst)
 
+        reduce_light = False
         while True:
             self.x += dx + int(random.uniform(-ms * MONSTER_RANDOM_WALK, ms * MONSTER_RANDOM_WALK))
             self.y += dy + int(random.uniform(-ms * MONSTER_RANDOM_WALK, ms * MONSTER_RANDOM_WALK))
@@ -80,6 +84,10 @@ class Monster:
                 break
             else:
                 ms = ms*2 + 1
+                reduce_light = True
+
+        if reduce_light:
+            lighting.reduce_player_light(impact=int(10 * MONSTER_MOVE_INTERVAL))
 
     def announce_itself(self):
         self.threat_bubble = ThreatBubble((self.x, self.y))

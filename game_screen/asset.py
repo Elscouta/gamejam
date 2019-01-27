@@ -28,6 +28,7 @@ S_DOOR = (MAP_TILESHEET, 6, 1)
 S_DOORWAY = (MAP_TILESHEET, 6, 0)
 SE_CORNER = (MAP_TILESHEET, 2, 2)
 HALO = (LIGHT_TILESHEET, 0, 0)
+SHADOW = (LIGHT_TILESHEET, 0, 1)
 WARNING = (MAP_TILESHEET, 3, 0)
 BEDSIDE_LAMP = (FURNITURE_TILESHEET, 4, 3)
 BED_TOP = (FURNITURE_TILESHEET, 4, 5)
@@ -46,7 +47,13 @@ def get_sprite(sprite_id):
     return _tilesheets[sprite_id[0]][sprite_id[1]][sprite_id[2]]
 
 
-@functools.lru_cache(maxsize=64)
+@functools.lru_cache(maxsize=256)
 def get_light_halo(radius):
     big_light_halo = get_sprite(HALO)
     return transform.scale(big_light_halo, (2 * radius, 2 * radius))
+
+
+@functools.lru_cache(maxsize=256)
+def get_shadow_halo(radius):
+    big_shadow = get_sprite(SHADOW)
+    return transform.scale(big_shadow, (2 * radius, 2 * radius))

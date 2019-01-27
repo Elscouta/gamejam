@@ -2,18 +2,21 @@ from pygame import Surface, SRCALPHA, Color, BLEND_RGBA_MIN
 from pygame.rect import Rect
 
 from config import PLAYER_WIDTH, PLAYER_HEIGHT, TILE_WIDTH, ROOM_WIDTH, TILE_HEIGHT, ROOM_HEIGHT
+from events import schedule_event
 from game_screen.asset import get_light_halo
 from utils import distance
 
-lightning_radius = 128
+player_lightning_radius = 192
 
 
 def get_light_area(source_x, source_y, source_radius):
     return Rect(source_x - source_radius, source_y - source_radius,
                 2*source_radius, 2*source_radius)
 
+
 def get_player_light_area(player_x, player_y):
-    return get_light_area(player_x + PLAYER_WIDTH / 2, player_y + PLAYER_HEIGHT / 2, lightning_radius)
+    return get_light_area(player_x + PLAYER_WIDTH / 2, player_y + PLAYER_HEIGHT / 2, player_lightning_radius)
+
 
 def clip_light_halo_by_room(halo, room, source_x, source_y, source_radius):
     room_mask = Surface((halo.get_width(), halo.get_height()), flags=SRCALPHA)
@@ -58,3 +61,18 @@ def draw_light_source(light_mask, source_x, source_y, source_radius):
         light_mask.blit(clipped_halo, map.to_screen_coords(get_light_area(edge_x, edge_y, secondary_radius)),
                          special_flags=BLEND_RGBA_MIN)
 
+
+def reduce_player_light(impact=1):
+    global player_lightning_radius
+    player_lightning_radius -= impact
+    if player_lightning_radius < 1:
+        player_lightning_radius = 1
+
+
+def rotate_lights():
+    pass
+
+
+def init():
+    schedule_event(rotate_lights, 1, oneshot=False)
+    schedule_event(reduce_player_light, 30, oneshot=False)
