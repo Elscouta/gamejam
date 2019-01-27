@@ -3,7 +3,10 @@ from pygame.rect import Rect
 from asset import NW_CORNER, N_WALL, NE_CORNER, W_WALL, FLOOR, E_WALL, SW_CORNER, S_WALL, SE_CORNER, N_DOOR, \
     W_DOOR, \
     E_DOOR, S_DOOR, N_DOORWAY, W_DOORWAY, E_DOORWAY, S_DOORWAY, BEDSIDE_LAMP, BED_TOP, BED_BOTTOM, PAINT_NW, PAINT_NE, \
-    PAINT_SW, PAINT_SE
+    PAINT_SW, PAINT_SE, PORCELAIN_NW_CORNER, PORCELAIN_N_WALL, PORCELAIN_N_DOOR, PORCELAIN_N_DOORWAY, \
+    PORCELAIN_NE_CORNER, PORCELAIN_W_WALL, PORCELAIN_W_DOOR, PORCELAIN_W_DOORWAY, PORCELAIN_FLOOR, PORCELAIN_E_WALL, \
+    PORCELAIN_E_DOOR, PORCELAIN_E_DOORWAY, PORCELAIN_SW_CORNER, PORCELAIN_S_WALL, PORCELAIN_S_DOOR, PORCELAIN_S_DOORWAY, \
+    PORCELAIN_SE_CORNER
 from config import WALL_WIDTH, TILE_WIDTH, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_CROP_BOTTOM, \
     PLAYER_CROP_TOP, PLAYER_CROP_RIGHT, PLAYER_CROP_LEFT
 from game_screen import player
@@ -54,6 +57,23 @@ SouthWall = Tile(S_WALL, bboxs=(bottom_wall_bbox,))
 SouthClosedDoor = Tile(S_DOOR, bboxs=(bottom_wall_bbox,))
 SouthOpenDoor = Tile(S_DOORWAY, bboxs=())
 SouthEastCorner = Tile(SE_CORNER, bboxs=(bottom_wall_bbox, right_wall_bbox))
+PorcelainNorthWestCorner = Tile(PORCELAIN_NW_CORNER, bboxs=(top_wall_bbox, left_wall_bbox))
+PorcelainNorthWall = Tile(PORCELAIN_N_WALL, bboxs=(top_wall_bbox,))
+PorcelainNorthClosedDoor = Tile(PORCELAIN_N_DOOR, bboxs=(top_wall_bbox,))
+PorcelainNorthOpenDoor = Tile(PORCELAIN_N_DOORWAY, bboxs=())
+PorcelainNorthEastCorner = Tile(PORCELAIN_NE_CORNER, bboxs=(top_wall_bbox, right_wall_bbox))
+PorcelainWestWall = Tile(PORCELAIN_W_WALL, bboxs=(left_wall_bbox,))
+PorcelainWestClosedDoor = Tile(PORCELAIN_W_DOOR, bboxs=(left_wall_bbox,))
+PorcelainWestOpenDoor = Tile(PORCELAIN_W_DOORWAY, bboxs=())
+PorcelainFloor = Tile(PORCELAIN_FLOOR, bboxs=())
+PorcelainEastWall = Tile(PORCELAIN_E_WALL, bboxs=(right_wall_bbox,))
+PorcelainEastClosedDoor = Tile(PORCELAIN_E_DOOR, bboxs=(right_wall_bbox,))
+PorcelainEastOpenDoor = Tile(PORCELAIN_E_DOORWAY, bboxs=())
+PorcelainSouthWestCorner = Tile(PORCELAIN_SW_CORNER, bboxs=(bottom_wall_bbox, left_wall_bbox))
+PorcelainSouthWall = Tile(PORCELAIN_S_WALL, bboxs=(bottom_wall_bbox,))
+PorcelainSouthClosedDoor = Tile(PORCELAIN_S_DOOR, bboxs=(bottom_wall_bbox,))
+PorcelainSouthOpenDoor = Tile(PORCELAIN_S_DOORWAY, bboxs=())
+PorcelainSouthEastCorner = Tile(PORCELAIN_SE_CORNER, bboxs=(bottom_wall_bbox, right_wall_bbox))
 BedsideLamp = Tile(BEDSIDE_LAMP, bboxs=(Rect(0, 0, 64, 64),))
 BedTop = Tile(BED_TOP, bboxs=(Rect(0, 0, 64, 64),))
 BedBottom = Tile(BED_BOTTOM, bboxs=(Rect(0, 0, 64, 45),))

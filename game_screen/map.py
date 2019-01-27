@@ -18,7 +18,11 @@ from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenD
     NorthEastCorner, \
     EastOpenDoor, \
     SouthEastCorner, EastWall, NorthWall, SouthWall, NorthWestCorner, NorthClosedDoor, SouthClosedDoor, WestClosedDoor, \
-    EastClosedDoor, BedsideLamp, BedTop, BedBottom, Tile
+    EastClosedDoor, BedsideLamp, BedTop, BedBottom, Tile, PorcelainFloor, PorcelainSouthWall, PorcelainNorthWall, \
+    PorcelainEastWall, PorcelainSouthEastCorner, PorcelainNorthEastCorner, PorcelainWestWall, PorcelainSouthWestCorner, \
+    PorcelainNorthWestCorner, PorcelainNorthClosedDoor, PorcelainSouthClosedDoor, PorcelainWestClosedDoor, \
+    PorcelainEastClosedDoor, PorcelainWestOpenDoor, PorcelainEastOpenDoor, PorcelainSouthOpenDoor, \
+    PorcelainNorthOpenDoor
 
 rooms = None
 h_edges = None
@@ -160,6 +164,47 @@ class WC(Room):
     def __repr__(self):
         return "WC(%s, %s)" % (self.x, self.y)
 
+    def get_tile(self, tile_x, tile_y) -> List[Tile]:
+        furniture_tiles = []
+        for f in self.furnitures:
+            if f.in_furniture(tile_x, tile_y):
+                furniture_tiles.append(f.get_tile(*f.room_coords_to_furniture_coords(tile_x, tile_y)))
+                break
+
+        if tile_x == 0:
+            if tile_y == 0:
+                base_tile = PorcelainNorthWestCorner
+            elif tile_y == DOOR_POSITION:
+                base_tile = v_edges[self.x][self.y].get_tile(right=True, porcelain=True)
+            elif tile_y == ROOM_HEIGHT - 1:
+                base_tile = PorcelainSouthWestCorner
+            else:
+                base_tile = PorcelainWestWall
+        elif tile_x == DOOR_POSITION:
+            if tile_y == 0:
+                base_tile = h_edges[self.x][self.y].get_tile(bottom=True, porcelain=True)
+            elif tile_y == ROOM_HEIGHT - 1:
+                base_tile = h_edges[self.x][self.y+1].get_tile(bottom=False, porcelain=True)
+            else:
+                base_tile = PorcelainFloor
+        elif tile_x == ROOM_WIDTH - 1:
+            if tile_y == 0:
+                base_tile = PorcelainNorthEastCorner
+            elif tile_y == DOOR_POSITION:
+                base_tile = v_edges[self.x+1][self.y].get_tile(right=False, porcelain=True)
+            elif tile_y == ROOM_HEIGHT - 1:
+                base_tile = PorcelainSouthEastCorner
+            else:
+                base_tile = PorcelainEastWall
+        else:
+            if tile_y == 0:
+                base_tile = PorcelainNorthWall
+            elif tile_y == ROOM_HEIGHT - 1:
+                base_tile = PorcelainSouthWall
+            else:
+                base_tile = PorcelainFloor
+
+        return [base_tile] + furniture_tiles
 
 class Edge:
     HORIZ = 1
@@ -220,43 +265,43 @@ class Wall(Edge):
     def __str__(self):
         return '+'
 
-    def get_tile(self, bottom=None, right=None):
+    def get_tile(self, bottom=None, right=None, porcelain=False):
         if self.dir == Edge.HORIZ:
             assert bottom is not None
 
             if bottom:
-                return NorthWall
+                return PorcelainNorthWall if porcelain else NorthWall
             else:
-                return SouthWall
+                return PorcelainSouthWall if porcelain else SouthWall
 
         else:
             assert right is not None
 
             if right:
-                return WestWall
+                return PorcelainWestWall if porcelain else WestWall
             else:
-                return EastWall
+                return PorcelainEastWall if porcelain else EastWall
 
 
 class ClosedDoor(Edge):
     passable = False
 
-    def get_tile(self, bottom=None, right=None):
+    def get_tile(self, bottom=None, right=None, porcelain=False):
         if self.dir == Edge.HORIZ:
             assert bottom is not None
 
             if bottom:
-                return NorthClosedDoor
+                return PorcelainNorthClosedDoor if porcelain else NorthClosedDoor
             else:
-                return SouthClosedDoor
+                return PorcelainSouthClosedDoor if porcelain else SouthClosedDoor
 
         else:
             assert right is not None
 
             if right:
-                return WestClosedDoor
+                return PorcelainWestClosedDoor if porcelain else WestClosedDoor
             else:
-                return EastClosedDoor
+                return PorcelainEastClosedDoor if porcelain else EastClosedDoor
 
     def __str__(self):
         if self.dir == Edge.HORIZ:
@@ -299,22 +344,22 @@ class OpenDoor(Edge):
     def __str__(self):
         return ' '
 
-    def get_tile(self, bottom=None, right=None):
+    def get_tile(self, bottom=None, right=None, porcelain=False):
         if self.dir == Edge.HORIZ:
             assert bottom is not None
 
             if bottom:
-                return NorthOpenDoor
+                return PorcelainNorthOpenDoor if porcelain else NorthOpenDoor
             else:
-                return SouthOpenDoor
+                return PorcelainSouthOpenDoor if porcelain else SouthOpenDoor
 
         else:
             assert right is not None
 
             if right:
-                return WestOpenDoor
+                return PorcelainWestOpenDoor if porcelain else WestOpenDoor
             else:
-                return EastOpenDoor
+                return PorcelainEastOpenDoor if porcelain else EastOpenDoor
 
 
 class MapCreationFailed(Exception):
