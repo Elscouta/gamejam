@@ -7,7 +7,7 @@ from config import MIN_MONSTER_DISTANCE, MONSTER_SPEED, MONSTER_MOVE_INTERVAL, M
     MONSTER_RANDOM_WALK, MONSTER_WARNING_INTERVAL, MONSTER_SPAWN_INTERVAL, TILE_WIDTH
 from events import schedule_event, clear_event
 from game_screen import player, map, lighting
-from game_screen.asset import get_sprite, WARNING, get_shadow_halo
+from asset import get_sprite, WARNING, get_shadow_halo
 from threat_bubble import ThreatBubble
 from utils import distance
 

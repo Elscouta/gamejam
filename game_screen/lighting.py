@@ -3,7 +3,7 @@ from pygame.rect import Rect
 
 from config import PLAYER_WIDTH, PLAYER_HEIGHT, TILE_WIDTH, ROOM_WIDTH, TILE_HEIGHT, ROOM_HEIGHT
 from events import schedule_event
-from game_screen.asset import get_light_halo
+from asset import get_light_halo
 from utils import distance
 
 player_lightning_radius = 192

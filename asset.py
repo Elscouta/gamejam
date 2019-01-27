@@ -9,6 +9,7 @@ from utils import sprite_sheet
 MAP_TILESHEET = 0
 LIGHT_TILESHEET = 1
 FURNITURE_TILESHEET = 2
+OHNOES_TILESHEET = 3
 
 NW_CORNER = (MAP_TILESHEET, 0, 0)
 N_WALL = (MAP_TILESHEET, 0, 1)
@@ -33,18 +34,29 @@ WARNING = (MAP_TILESHEET, 3, 0)
 BEDSIDE_LAMP = (FURNITURE_TILESHEET, 4, 3)
 BED_TOP = (FURNITURE_TILESHEET, 4, 5)
 BED_BOTTOM = (FURNITURE_TILESHEET, 5, 5)
+OHNOES1 = (OHNOES_TILESHEET, 0, 0)
+OHNOES2 = (OHNOES_TILESHEET, 0, 1)
 
 _tilesheets = {}
+_player_sprites = None
 
 
 def init():
+    global _player_sprites
+
     _tilesheets[MAP_TILESHEET] = sprite_sheet(os.path.join('assets', 'tilesetHouse.png'), (TILE_WIDTH, TILE_HEIGHT))
     _tilesheets[LIGHT_TILESHEET] = sprite_sheet(os.path.join('assets', 'halo.png'), (640, 640))
     _tilesheets[FURNITURE_TILESHEET] = sprite_sheet(os.path.join('assets', 'house_objects.png'), (TILE_WIDTH, TILE_HEIGHT))
+    _tilesheets[OHNOES_TILESHEET] = sprite_sheet(os.path.join('assets', 'ohnoes.png'), (2*TILE_WIDTH, 2*TILE_HEIGHT))
+    _player_sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
 
 
 def get_sprite(sprite_id):
     return _tilesheets[sprite_id[0]][sprite_id[1]][sprite_id[2]]
+
+
+def get_player_sprites():
+    return _player_sprites
 
 
 @functools.lru_cache(maxsize=256)

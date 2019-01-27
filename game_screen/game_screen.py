@@ -1,22 +1,25 @@
+from typing import Optional
+
 import pygame as pg
 from pygame import Surface, SRCALPHA
 from pygame.color import Color
 
-from game_screen import player, monsters, map, asset, logic, lighting
+from defeat_screen.defeat_screen import DefeatScreen
+from game_screen import player, monsters, map, logic, lighting
+import asset
 from game_screen.logic import GameOverEx
-from screen import Screen
+from screen import Screen, ScreenType
 
 
 class GameScreen(Screen):
     def __init__(self):
-        asset.init()
         map.init()
         map.print()
         player.init()
         lighting.init()
         logic.init()
 
-    def draw(self, screen: Surface, clock: pg.time.Clock, player_speed: int) -> bool:
+    def draw(self, screen: Surface, clock: pg.time.Clock) -> Optional[ScreenType]:
         player.handle_keys()
 
         light_mask = Surface((screen.get_width(), screen.get_height()), flags=SRCALPHA)
@@ -33,11 +36,10 @@ class GameScreen(Screen):
         try:
             logic.tick()
         except GameOverEx:
-            return True
+            return DefeatScreen
 
         fps = clock.get_fps()
         if fps > 0:
-            player_speed = player_speed * (60 / fps)
-            pg.display.set_caption(f"FPS: {clock.get_fps()}, player speed : {player_speed}")
+            pg.display.set_caption(f"FPS: {clock.get_fps()}")
 
-        return False
+        return None

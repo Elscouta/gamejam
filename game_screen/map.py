@@ -7,7 +7,7 @@ from sys import stdout
 from pygame import Surface
 from pygame.rect import Rect
 
-from game_screen.asset import get_sprite
+from asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS

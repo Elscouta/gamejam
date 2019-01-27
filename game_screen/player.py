@@ -4,6 +4,8 @@ from itertools import product
 from pygame import time
 from pygame.mixer import SoundType
 
+import asset
+
 from game_screen import map, lighting
 
 import pygame as pg
@@ -11,7 +13,6 @@ import pygame as pg
 from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH, \
     PLAYER_FRAME_ROTATION
 from game_screen.lighting import draw_light_source
-from utils import sprite_sheet
 
 
 PLAYER_FRAME_LENGTH = PLAYER_FRAME_ROTATION // 3
@@ -25,7 +26,6 @@ class _state:
     remaining_millipixels = 0
     last_tick = None
 
-sprites = None
 footstep_sound: SoundType = None
 
 def draw(screen, light_mask):
@@ -68,11 +68,11 @@ def handle_keys():
 
         if key[pg.K_DOWN]:
             new_y = new_y + dist
-            _state.image = sprites[0][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites[0][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
         elif key[pg.K_UP]:
             new_y = new_y - dist
-            _state.image = sprites[3][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites[3][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
 
         if _valid_position(new_x, new_y):
@@ -84,12 +84,12 @@ def handle_keys():
 
         if key[pg.K_RIGHT]:
             new_x = new_x + dist
-            _state.image = sprites[2][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites[2][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
         elif key[pg.K_LEFT]:
             new_x = new_x - dist
             moving = True
-            _state.image = sprites[1][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites[1][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
 
         if _valid_position(new_x, new_y):
             _state.x = new_x
@@ -113,13 +113,10 @@ def get_pos():
 
 
 def init():
-    global sprites
     global footstep_sound
     footstep_sound = pg.mixer.Sound(os.path.join('assets', 'sfx_footsteps.wav'))
     footstep_sound.set_volume(0.02)
     _state.x, _state.y = map.initial_room.get_initial_position()
     _state.last_tick = time.get_ticks()
-
-    sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
     _state.current_horizontal_cycle = 0
-    _state.image = sprites[0][0]
+    _state.image = asset.get_player_sprites()[0][0]

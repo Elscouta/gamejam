@@ -1,10 +1,11 @@
 import os
+from typing import Optional
 
 import pygame as pg
 from pygame.constants import *
 
 from events import schedule_event, clear_event
-from screen import Screen
+from screen import Screen, ScreenType
 from random import randint
 
 class TitleScreen(Screen):
@@ -29,9 +30,9 @@ class TitleScreen(Screen):
     def cleanup(self):
         clear_event(self.update_event)
 
-    def draw(self, screen: pg.Surface, clock: pg.time.Clock, player_speed: int) -> bool:
+    def draw(self, screen: pg.Surface, clock: pg.time.Clock) -> Optional[ScreenType]:
         surface = self.font.render('A Loo In the Dark', False, (self.red, self.green, self.blue))
         text_rec = surface.get_rect(center=(screen.get_size()[0] // 2, screen.get_size()[1] // 2))
         screen.blit(surface, text_rec)
 
-        return False
+        return None
