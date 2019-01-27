@@ -8,7 +8,7 @@ from config import MIN_MONSTER_DISTANCE, MONSTER_SPEED, MONSTER_MOVE_INTERVAL, M
 from events import schedule_event, clear_event
 from game_screen import player, map, lighting
 from asset import get_sprite, WARNING, get_shadow_halo
-from threat_bubble import ThreatBubble
+from game_screen.threat_bubble import ThreatBubble
 from utils import distance
 
 spawn_rate = 40
@@ -23,7 +23,7 @@ class Monster:
         self.monster_sound = pygame.mixer.Sound(os.path.join('assets', 'sfx_scream.wav'))
         self.monster_sound.set_volume(1)
         self.monster_sound.play()
-        self._events.add(schedule_event(self.announce_itself, MONSTER_ANNOUNCE_INTERVAL*10 + 1, oneshot=False))
+        self._events.add(schedule_event(self.announce_itself, MONSTER_ANNOUNCE_INTERVAL*10 + 3, oneshot=False))
         self._events.add(schedule_event(self.move, MONSTER_MOVE_INTERVAL*10, oneshot=False))
         self._events.add(schedule_event(self.switch_warning_sign, MONSTER_WARNING_INTERVAL, oneshot=False))
 

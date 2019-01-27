@@ -78,5 +78,6 @@ class GameOver:
         return lighting.player_lightning_radius <= 15
 
     def action(self):
+        monsters.destroy_all()
         raise GameOverEx()
 

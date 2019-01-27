@@ -1,6 +1,7 @@
 import functools
 import os
 
+import pygame as pg
 from pygame import transform
 
 from config import TILE_WIDTH, TILE_HEIGHT
@@ -10,6 +11,7 @@ MAP_TILESHEET = 0
 LIGHT_TILESHEET = 1
 FURNITURE_TILESHEET = 2
 OHNOES_TILESHEET = 3
+BUBBLE_TILESHEET = 4
 
 NW_CORNER = (MAP_TILESHEET, 0, 0)
 N_WALL = (MAP_TILESHEET, 0, 1)
@@ -36,9 +38,29 @@ BED_TOP = (FURNITURE_TILESHEET, 4, 5)
 BED_BOTTOM = (FURNITURE_TILESHEET, 5, 5)
 OHNOES1 = (OHNOES_TILESHEET, 0, 0)
 OHNOES2 = (OHNOES_TILESHEET, 0, 1)
+BUBBLE_OO = (BUBBLE_TILESHEET, 0, 0)
+BUBBLE_OF = (BUBBLE_TILESHEET, 0, 1)
+BUBBLE_FO = (BUBBLE_TILESHEET, 0, 2)
+BUBBLE_FF = (BUBBLE_TILESHEET, 0, 3)
+BURGER = (BUBBLE_TILESHEET, 0, 4)
 
 _tilesheets = {}
 _player_sprites = None
+
+
+def _load_bubble_tilesheet():
+    bubble_orig = pg.image.load(os.path.join('assets', 'speech_bubble.png')).convert_alpha()
+    bubble_orig = pg.transform.scale(bubble_orig, (75, 50))
+    bubble_rect = bubble_orig.get_rect()
+    burger_orig = pg.image.load(os.path.join('assets', 'pixel_burger.png')).convert_alpha()
+
+    return [[
+        bubble_orig,
+        pg.transform.flip(bubble_orig, False, True),
+        pg.transform.flip(bubble_orig, True, False),
+        pg.transform.flip(bubble_orig, True, True),
+        pg.transform.scale(burger_orig, (int(bubble_rect.w / 2), int(bubble_rect.h / 2)))
+    ]]
 
 
 def init():
@@ -48,6 +70,7 @@ def init():
     _tilesheets[LIGHT_TILESHEET] = sprite_sheet(os.path.join('assets', 'halo.png'), (640, 640))
     _tilesheets[FURNITURE_TILESHEET] = sprite_sheet(os.path.join('assets', 'house_objects.png'), (TILE_WIDTH, TILE_HEIGHT))
     _tilesheets[OHNOES_TILESHEET] = sprite_sheet(os.path.join('assets', 'ohnoes.png'), (2*TILE_WIDTH, 2*TILE_HEIGHT))
+    _tilesheets[BUBBLE_TILESHEET] = _load_bubble_tilesheet()
     _player_sprites = sprite_sheet(os.path.join('assets', 'children.png'), (48, 48))
 
 
