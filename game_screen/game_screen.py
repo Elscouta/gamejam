@@ -6,7 +6,6 @@ from pygame.color import Color
 
 from defeat_screen.defeat_screen import DefeatScreen
 from game_screen import player, monsters, map, logic, lighting
-import asset
 from game_screen.logic import GameOverEx, WonEx
 from screen import Screen, ScreenType
 from victory_screen.end_screen import EndScreen

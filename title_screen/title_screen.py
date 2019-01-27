@@ -35,7 +35,7 @@ class TitleScreen(Screen):
         main_text = self.font.render('A Loo In the Dark', False, (self.red, self.green, self.blue))
         main_text_rec = main_text.get_rect(center=(screen.get_size()[0] // 2, screen.get_size()[1] // 2))
         screen.blit(main_text, main_text_rec)
-        creator_text = self.small_font.render('A RB/JJ Game', False, (255, 255, 255))
+        creator_text = self.small_font.render('A JJ/RB/JJ Game', False, (255, 255, 255))
         creator_text_rec = creator_text.get_rect(center=(screen.get_size()[0] // 2, screen.get_size()[1] // 2 + 70))
         screen.blit(creator_text, creator_text_rec)
 
