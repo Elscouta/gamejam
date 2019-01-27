@@ -1,19 +1,15 @@
 import os
 from itertools import product
 
+import pygame as pg
 from pygame import time
 from pygame.mixer import SoundType
 
 import asset
-
-from game_screen import map, lighting
-
-import pygame as pg
-
 from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH, \
     PLAYER_FRAME_ROTATION
+from game_screen import map, lighting
 from game_screen.lighting import draw_light_source
-
 
 PLAYER_FRAME_LENGTH = PLAYER_FRAME_ROTATION // 3
 
@@ -26,7 +22,9 @@ class _state:
     remaining_millipixels = 0
     last_tick = None
 
+
 footstep_sound: SoundType = None
+
 
 def draw(screen, light_mask):
     player_screen_x = SCREEN_WIDTH / 2

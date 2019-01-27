@@ -1,8 +1,10 @@
 import os
+import time
 from typing import Optional
 
 import pygame as pg
 
+import asset
 from config import SCREEN_HEIGHT
 from screen import Screen, ScreenType
 
@@ -10,8 +12,12 @@ from screen import Screen, ScreenType
 class EndScreen(Screen):
     def __init__(self):
         self.tmp = 0
+        self.player_sprites = asset.get_player_sprites()
         self.font = pg.font.Font(os.path.join('assets', 'ButterflyKids-Regular.ttf'), 70)
         self.stop = False
+        self.current_sprite = 1
+        self.sprite_speed_delta = 0
+        self.time = None
         self.isPlayingPeeSound = False
         self.toilet_scene: pg.Surface = pg.image.load(os.path.join('assets', 'bathroom_scene.png'))
         self.character_scene: pg.Surface = pg.image.load(os.path.join('assets', 'happy_child.png'))
@@ -30,28 +36,32 @@ class EndScreen(Screen):
         text_rec = surface.get_rect(center=(screen.get_size()[0] // 2, screen.get_size()[1] // 2))
         screen.blit(surface, text_rec)
 
+    def draw_scene(self, screen, rect):
+        screen.blit(self.toilet_scene, rect)
+
+        character_rec = (self.player_sprites[3][self.current_sprite]).get_rect(center=(screen.get_size()[0] // 2,
+                                                                                       screen.get_size()[1] - (50 + self.sprite_speed_delta))
+                                                                               )
+        screen.blit(self.player_sprites[3][self.current_sprite], character_rec)
+        self.sprite_speed_delta += 1
+        self.current_sprite += 1
+        if self.current_sprite == 3:
+            self.current_sprite = 0
+
     def draw(self, screen: pg.Surface, clock: pg.time.Clock) -> Optional[ScreenType]:
-        if self.stop is False:
+        if not self.time or time.time() - self.time > 20:
             if self.rect.y == -400:
                 if self.tmp < 50:
                     screen.blit(self.character_scene, screen.get_rect())
                     self.tmp += 1
                 else:
-                    self.tmp = 0
-                    screen.blit(self.toilet_scene, self.rect)
-                    self.rect.y += 1
-            elif self.rect.y < -200:
-                if self.tmp < 25:
-                    screen.blit(self.character_scene, screen.get_rect())
-                    self.tmp += 1
-                else:
-                    screen.blit(self.toilet_scene, self.rect)
-                    self.rect.y += 1
+                    self.draw_scene(screen, self.rect)
+                    self.rect.y += 3
             else:
-                screen.blit(self.toilet_scene, self.rect)
+                self.draw_scene(screen, self.rect)
                 self.rect.y += 3
-                if self.rect.y <= 0:
-                    self.stop = True
+                if self.rect.y >= 0:
+                    self.time = time.time()
         else:
             self.show_ending(screen)
 

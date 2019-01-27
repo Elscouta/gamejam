@@ -5,6 +5,8 @@ from typing import List
 import pygame
 from pygame.surface import Surface
 
+from events import schedule_event
+
 
 def distance(pos1, pos2):
     dx = pos1[0] - pos2[0]
@@ -13,24 +15,24 @@ def distance(pos1, pos2):
 
 
 def fade_in(screen: Surface, surface: Surface, fade_time_in_s):
-    starting_time = time.time()
-
-    while time.time() - starting_time <= fade_time_in_s:
-        state_time = time.time() - starting_time
-        # last_state_change = time.time() - state_time
-        alpha = 1.0 * state_time / fade_time_in_s
-        surface.set_alpha(alpha * 255)
-        screen.blit(surface, screen.get_rect())
-        pygame.display.update()
+    # while time.time() - starting_time <= fade_time_in_s:
+    #     state_time = time.time() - starting_time
+    #     # last_state_change = time.time() - state_time
+    #     alpha = 1.0 * state_time / fade_time_in_s
+    #     surface.set_alpha(alpha * 255)
+    #     screen.blit(surface, screen.get_rect())
+    #     pygame.display.update()
+    pass
 
 
 def fade_out(screen: Surface, surface: Surface, fade_time_in_s, starting_time):
-    state_time = time.time() - starting_time
-    # last_state_change = time.time() - state_time
-    alpha = 1 - (1.0 * state_time / fade_time_in_s)
-    surface.set_alpha(alpha * 255)
-    screen.blit(surface, screen.get_rect())
-    pygame.display.update()
+    # state_time = time.time() - starting_time
+    # # last_state_change = time.time() - state_time
+    # alpha = 1 - (1.0 * state_time / fade_time_in_s)
+    # surface.set_alpha(alpha * 255)
+    # screen.blit(surface, screen.get_rect())
+    # pygame.display.update()
+    pass
 
 
 def sprite_sheet(file, sprite_size, pos=(0, 0)) -> List[List[Surface]]:
