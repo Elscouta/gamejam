@@ -1,11 +1,10 @@
 import os
 import random
+from itertools import chain, product
+from sys import stdout
 from typing import List
 
 import pygame as pg
-from itertools import chain, product
-from sys import stdout
-
 from pygame import Surface
 from pygame.rect import Rect
 
@@ -61,8 +60,8 @@ class Room:
 
     @property
     def rect(self):
-        return Rect(self.x * ROOM_WIDTH*TILE_WIDTH, self.y * ROOM_HEIGHT*TILE_HEIGHT,
-                    ROOM_WIDTH*TILE_WIDTH, ROOM_HEIGHT*TILE_HEIGHT)
+        return Rect(self.x * ROOM_WIDTH * TILE_WIDTH, self.y * ROOM_HEIGHT * TILE_HEIGHT,
+                    ROOM_WIDTH * TILE_WIDTH, ROOM_HEIGHT * TILE_HEIGHT)
 
     def north(self):
         return h_edges[self.x][self.y]
@@ -99,14 +98,14 @@ class Room:
             if tile_y == 0:
                 base_tile = h_edges[self.x][self.y].get_tile(bottom=True)
             elif tile_y == ROOM_HEIGHT - 1:
-                base_tile = h_edges[self.x][self.y+1].get_tile(bottom=False)
+                base_tile = h_edges[self.x][self.y + 1].get_tile(bottom=False)
             else:
                 base_tile = Floor
         elif tile_x == ROOM_WIDTH - 1:
             if tile_y == 0:
                 base_tile = NorthEastCorner
             elif tile_y == DOOR_POSITION:
-                base_tile = v_edges[self.x+1][self.y].get_tile(right=False)
+                base_tile = v_edges[self.x + 1][self.y].get_tile(right=False)
             elif tile_y == ROOM_HEIGHT - 1:
                 base_tile = SouthEastCorner
             else:
@@ -192,9 +191,9 @@ class Edge:
 
     def north(self):
         assert self.dir == Edge.HORIZ
-        if _outside_map(self.x, self.y-1):
+        if _outside_map(self.x, self.y - 1):
             return OutsideMap
-        return rooms[self.x][self.y-1]
+        return rooms[self.x][self.y - 1]
 
     def south(self):
         assert self.dir == Edge.HORIZ
@@ -210,9 +209,9 @@ class Edge:
 
     def west(self):
         assert self.dir == Edge.VERT
-        if _outside_map(self.x-1, self.y):
+        if _outside_map(self.x - 1, self.y):
             return OutsideMap
-        return rooms[self.x-1][self.y]
+        return rooms[self.x - 1][self.y]
 
 
 class Wall(Edge):
@@ -269,7 +268,6 @@ class ClosedDoor(Edge):
 
 
 def ClosingDoor(closing_priority):
-
     class _ClosingDoor(Edge):
         @property
         def passable(self):
@@ -296,7 +294,6 @@ def ClosingDoor(closing_priority):
 
 
 class OpenDoor(Edge):
-
     passable = True
 
     def __str__(self):
@@ -327,15 +324,15 @@ class MapCreationFailed(Exception):
 def _fill_initial_surface():
     global map_surface
 
-    map_surface = Surface((MAP_WIDTH*ROOM_WIDTH*TILE_WIDTH, MAP_HEIGHT*ROOM_HEIGHT*TILE_HEIGHT))
+    map_surface = Surface((MAP_WIDTH * ROOM_WIDTH * TILE_WIDTH, MAP_HEIGHT * ROOM_HEIGHT * TILE_HEIGHT))
     room_x = 0
 
-    for room_i in range (0, MAP_WIDTH):
+    for room_i in range(0, MAP_WIDTH):
         room_y = 0
 
-        for room_j in range (0, MAP_HEIGHT):
-            for tile_i in range (0, ROOM_WIDTH):
-                for tile_j in range (0, ROOM_HEIGHT):
+        for room_j in range(0, MAP_HEIGHT):
+            for tile_i in range(0, ROOM_WIDTH):
+                for tile_j in range(0, ROOM_HEIGHT):
                     x_coord = room_x + tile_i * TILE_WIDTH
                     y_coord = room_y + tile_j * TILE_HEIGHT
                     for t in rooms[room_i][room_j].get_tile(tile_i, tile_j):
@@ -353,41 +350,26 @@ def _replace_door_bitmap():
     newly_closed_door: Edge = closing_door_sequence[closed_door_count - 1]
 
     if newly_closed_door.dir == Edge.VERT:
-        for i in range(-1, 0):
-            room: Room = rooms[newly_closed_door.x][newly_closed_door.y + i]
+        for i in range(-1, 1):
+            room: Room = rooms[newly_closed_door.x + i][newly_closed_door.y]
             tile_i = 6 if i == -1 else 0
             tile_j = DOOR_POSITION
-            sprite_id = room.get_tile(tile_i, tile_j).sprite_id
-            x_coord = (room.x * ROOM_WIDTH * TILE_WIDTH) + tile_i * TILE_WIDTH
-            y_coord = (room.y * ROOM_HEIGHT * TILE_HEIGHT) + tile_j * TILE_HEIGHT
-            map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
+            for tile in room.get_tile(tile_i, tile_j):
+                sprite_id = tile.sprite_id
+                x_coord = (room.x * ROOM_WIDTH * TILE_WIDTH) + tile_i * TILE_WIDTH
+                y_coord = (room.y * ROOM_HEIGHT * TILE_HEIGHT) + tile_j * TILE_HEIGHT
+                map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
 
     if newly_closed_door.dir == Edge.HORIZ:
-        for i in range(-1, 0):
-            room: Room = rooms[newly_closed_door.x + 1][newly_closed_door.y]
+        for i in range(-1, 1):
+            room: Room = rooms[newly_closed_door.x][newly_closed_door.y + i]
             tile_i = DOOR_POSITION
             tile_j = 6 if i == -1 else 0
-            sprite_id = room.get_tile(tile_i, tile_j).sprite_id
-            x_coord = (room.x * ROOM_WIDTH * TILE_WIDTH) + tile_i * TILE_WIDTH
-            y_coord = (room.y * ROOM_HEIGHT * TILE_HEIGHT) + tile_j * TILE_HEIGHT
-            map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
-
-
-    # map_surface = Surface((MAP_WIDTH*ROOM_WIDTH*TILE_WIDTH, MAP_HEIGHT*ROOM_HEIGHT*TILE_HEIGHT))
-    # room_x = 0
-    #
-    # for room_i in range (0, MAP_WIDTH):
-    #     room_y = 0
-    #
-    #     for room_j in range (0, MAP_HEIGHT):
-    #         for tile_i in range (0, ROOM_WIDTH):
-    #             for tile_j in range (0, ROOM_HEIGHT):
-    #                 sprite_id = rooms[room_i][room_j].get_tile(tile_i, tile_j).sprite_id
-    #                 x_coord = room_x + tile_i * TILE_WIDTH
-    #                 y_coord = room_y + tile_j * TILE_HEIGHT
-    #                 map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
-    #         room_y += ROOM_HEIGHT * TILE_HEIGHT
-    #     room_x += ROOM_WIDTH * TILE_WIDTH
+            for tile in room.get_tile(tile_i, tile_j):
+                sprite_id = tile.sprite_id
+                x_coord = (room.x * ROOM_WIDTH * TILE_WIDTH) + tile_i * TILE_WIDTH
+                y_coord = (room.y * ROOM_HEIGHT * TILE_HEIGHT) + tile_j * TILE_HEIGHT
+                map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
 
 
 def _determine_initial_room():
@@ -459,10 +441,16 @@ def _bfs_scan_creation():
 
     for i in range(0, min(closing_doors_count, MAX_CLOSING_DOORS)):
         closing_door_sequence[i].replace(ClosingDoor(i))
+        if closing_door_sequence[i].dir == Edge.HORIZ:
+            closing_door_sequence[i] = h_edges[closing_door_sequence[i].x][closing_door_sequence[i].y]
+        if closing_door_sequence[i].dir == Edge.VERT:
+            closing_door_sequence[i] = v_edges[closing_door_sequence[i].x][closing_door_sequence[i].y]
+
 
 def _init_sound():
     global closing_door_sound
     closing_door_sound = pg.mixer.Sound(os.path.join('assets', 'sfx_footsteps.wav'))
+
 
 def _create():
     global rooms, h_edges, v_edges
@@ -581,7 +569,8 @@ def get_tile(player_x, player_y) -> List[Tile]:
 
 
 def random_point():
-    return random.randint(0, MAP_WIDTH*ROOM_WIDTH*TILE_WIDTH), random.randint(0, MAP_HEIGHT*ROOM_HEIGHT*TILE_HEIGHT)
+    return random.randint(0, MAP_WIDTH * ROOM_WIDTH * TILE_WIDTH), random.randint(0,
+                                                                                  MAP_HEIGHT * ROOM_HEIGHT * TILE_HEIGHT)
 
 
 def to_screen_coords(*args):
@@ -595,7 +584,7 @@ def to_screen_coords(*args):
     return args[0] + (SCREEN_WIDTH / 2 - player.get_x()), args[1] + SCREEN_HEIGHT / 2 - player.get_y()
 
 
-def print():
+def print_map():
     for j in range(0, MAP_HEIGHT):
         for i in range(0, MAP_WIDTH):
             stdout.write('+')

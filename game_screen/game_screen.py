@@ -15,7 +15,7 @@ from victory_screen.end_screen import EndScreen
 class GameScreen(Screen):
     def __init__(self):
         map.init()
-        map.print()
+        map.print_map()
         player.init()
         lighting.init()
         logic.init()
