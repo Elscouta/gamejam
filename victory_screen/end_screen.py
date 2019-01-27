@@ -4,7 +4,7 @@ from typing import Optional
 import pygame as pg
 
 import asset
-from config import SCREEN_HEIGHT
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from events import schedule_event
 from screen import Screen, ScreenType
 
@@ -44,13 +44,11 @@ class EndScreen(Screen):
     def draw_scene(self, screen, rect):
         screen.blit(self.toilet_scene, rect)
 
-        character_rec = (self.player_sprites[3][self.current_sprite]) \
-            .get_rect(center=(
-            screen.get_size()[0] // 2,
-            screen.get_size()[1] - (45 + self.sprite_speed_delta)
-        )
-        )
+        character_rec = (self.player_sprites[3][self.current_sprite]).get_rect(
+            center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - (45 + self.sprite_speed_delta)))
+
         screen.blit(self.player_sprites[3][self.current_sprite], character_rec)
+
         self.sprite_speed_delta += 1
         self.current_sprite += 1
         if self.current_sprite == 3:
@@ -61,7 +59,7 @@ class EndScreen(Screen):
             self.show_ending(screen)
         else:
             screen.blit(self.toilet_scene, self.rect)
-            for _ in range(0, self.get_pixels_to_move(15)):
+            for _ in range(0, self.get_pixels_to_move(30)):
                 if self.rect.y < 0:
                     self.draw_scene(screen, self.rect)
                     self.rect.y += 3
@@ -87,6 +85,8 @@ class EndScreen(Screen):
         self.last_tick = new_tick
 
         millipixels = (tick_since_last * item_speed) + self.remaining_millipixels
+
         pixel_moves = millipixels // 1000
-        self.remaining_millipixels = pixel_moves % 1000
+        self.remaining_millipixels = millipixels % 1000
+
         return pixel_moves

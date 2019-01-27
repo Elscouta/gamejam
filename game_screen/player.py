@@ -106,7 +106,7 @@ def handle_keys():
 
     millipixels = (tick_since_last * PLAYER_SPEED) + _state.remaining_millipixels
     pixel_moves = millipixels // 1000
-    _state.remaining_millipixels = pixel_moves % 1000
+    _state.remaining_millipixels = millipixels % 1000
 
     for _ in range(0, pixel_moves):
         new_x = _state.x
