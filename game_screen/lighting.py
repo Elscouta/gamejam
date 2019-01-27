@@ -34,6 +34,61 @@ def clip_light_halo_by_room(halo, room, source_x, source_y, source_radius):
 
     return clipped_halo
 
+def get_light_source_dampening(source_x, source_y):
+    from game_screen import map, player
+
+    sroom = map.get_room(source_x, source_y)
+    proom = map.get_room(*player.get_pos())
+
+    if sroom == proom:
+        return 1
+    elif sroom.x == proom.x and sroom.y > proom.y:
+        dir = 'north'
+        length = sroom.y - proom.y
+        c1 = source_x
+        c2 = player.get_x()
+        c = sroom.x * TILE_WIDTH * ROOM_WIDTH + 228
+    elif sroom.x == proom.x and sroom.y < proom.y:
+        dir = 'south'
+        length = proom.y - sroom.y
+        c1 = source_x
+        c2 = player.get_x()
+        c = sroom.x * TILE_WIDTH * ROOM_WIDTH + 228
+    elif sroom.y == proom.y and sroom.x > proom.x:
+        dir = 'east'
+        length = sroom.x - proom.x
+        c1 = source_y
+        c2 = player.get_y()
+        c = sroom.y * TILE_WIDTH * ROOM_WIDTH + 228
+    elif sroom.y == proom.y and sroom.x < proom.x:
+        dir = 'west'
+        length = proom.x - sroom.x
+        c1 = source_y
+        c2 = player.get_y()
+        c = sroom.y * TILE_WIDTH * ROOM_WIDTH + 228
+    else:
+        return 0
+
+    if length >= 3:
+        return 0
+
+    croom = proom
+    while croom != sroom:
+        if not map.get_dir(croom, dir).passable:
+            return 0
+        croom = map.get_dir(map.get_dir(croom, dir), dir)
+
+    damp = 0.75
+    if length >= 1:
+        damp *= 1 - 0.5 * abs(2*c - c1 - c2) / (ROOM_WIDTH * TILE_WIDTH)
+
+    if length >= 2:
+        damp *= 0.75
+        damp *= 1 - 0.30 * abs(3*c - 2 * c1 - c2) / (ROOM_WIDTH * TILE_WIDTH)
+        damp *= 1 - 0.30 * abs(3*c - c1 - 2 * c2) / (ROOM_WIDTH * TILE_WIDTH)
+
+    return damp
+
 def draw_light_source(light_mask, source_x, source_y, source_radius):
     from game_screen import map
 

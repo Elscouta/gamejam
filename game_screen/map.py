@@ -13,7 +13,7 @@ from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, T
     SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
 from game_screen.furniture import Paint, Furniture
-from game_screen.lighting import draw_light_source
+from game_screen.lighting import draw_light_source, get_light_source_dampening
 from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, \
     NorthEastCorner, \
     EastOpenDoor, \
@@ -576,6 +576,15 @@ def _position_light_sources_and_furniture():
     light_sources.append((initial_room.x * ROOM_WIDTH * TILE_WIDTH + 96,
                           initial_room.y * ROOM_HEIGHT * TILE_HEIGHT + 36,
                           128))
+    x = final_room.x * ROOM_WIDTH * TILE_WIDTH + 228
+    y = final_room.y * ROOM_WIDTH * TILE_WIDTH + 228
+    light_sources.append((x, y, 278))
+
+    for d in DIRECTIONS:
+        edge = get_dir(final_room, d)
+        if edge.passable:
+            x, y = edge.get_pixel_coords()
+            light_sources.append((x, y, 96))
 
 
 def init():
@@ -590,7 +599,11 @@ def init():
 def draw(screen, light_mask):
     screen.blit(map_surface, to_screen_coords(0, 0))
     for source_x, source_y, source_radius in light_sources:
-        draw_light_source(light_mask, source_x, source_y, source_radius)
+        damp = get_light_source_dampening(source_x, source_y)
+        if not damp:
+            continue
+
+        draw_light_source(light_mask, source_x, source_y, int(source_radius*damp))
 
 
 def close_door():
