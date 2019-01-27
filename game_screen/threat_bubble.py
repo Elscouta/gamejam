@@ -32,6 +32,7 @@ class ThreatBubble(pg.sprite.Sprite):
 
     def set_image(self, monster_position: Tuple[int, int]):
         self.offset = (37, 15)
+        self.x_burger_offset = 5
         self.image = self.image_orig
 
         qsw, qsh = SCREEN_WIDTH // 4, SCREEN_HEIGHT // 4
@@ -39,6 +40,7 @@ class ThreatBubble(pg.sprite.Sprite):
 
         if qsw <= mpx < 2*qsw or 3*qsw <= mpx:
             reverse_x = 1
+            self.x_burger_offset *= -1
             self.offset = (-self.offset[0], self.offset[1])
         else:
             reverse_x = 0
@@ -80,5 +82,5 @@ class ThreatBubble(pg.sprite.Sprite):
             x = int(k * (x - cx) + cx)
 
         screen.blit(self.image, (x + self.offset[0] - self.rect.w // 2, y + self.offset[1] - self.rect.h // 2))
-        screen.blit(self.burger, (x + self.offset[0] - (self.burger.get_size()[0] // 2),
-                                  y + self.offset[1] - (self.burger.get_size()[1] // 2)))
+        screen.blit(self.burger, (x + self.offset[0] + self.x_burger_offset - (self.burger.get_size()[0] // 2),
+                                  y + self.offset[1] - 2 - (self.burger.get_size()[1] // 2)))
