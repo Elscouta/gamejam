@@ -20,7 +20,7 @@ pg.mixer_music.load(os.path.join('assets', 'music.ogg'))
 pg.mixer_music.play(-1)
 pg.mixer_music.set_volume(1)
 
-screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FULLSCREEN)
+screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 events.init()
 asset.init()
