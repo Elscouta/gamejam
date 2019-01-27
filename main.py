@@ -25,7 +25,7 @@ asset.init()
 
 pg.display.set_caption("A loo in the dark!")
 
-currentDisplayScreen: Screen = EndScreen()
+currentDisplayScreen: Screen = TitleScreen()
 
 clock = pg.time.Clock()
 
@@ -34,7 +34,7 @@ while True:
         if event.type == QUIT or event.type == KEYDOWN and event.key == K_ESCAPE:
             pg.quit()
             sys.exit()
-        if type(currentDisplayScreen) == TitleScreen or type(currentDisplayScreen) == EndScreen \
+        if (type(currentDisplayScreen) == TitleScreen or type(currentDisplayScreen) == EndScreen) \
                 and event.type == KEYDOWN and event.key == K_RETURN:
             currentDisplayScreen = GameScreen()
 
