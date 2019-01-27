@@ -63,7 +63,6 @@ class Won:
 
     def condition(self):
         px, py = player.get_pos()
-        print(map.get_room(px, py))
         return map.get_room(px, py) == map.final_room
 
     def action(self):
@@ -116,7 +115,7 @@ class OutOfBed:
 
         _state.phase = PHASE_EXPLORATION
         monsters.start_spawning()
-        closing_door_event = schedule_event(map.close_door, 20 * 10, oneshot=False)
+        closing_door_event = schedule_event(map.close_door, 20, oneshot=False)
 
 
 @trigger

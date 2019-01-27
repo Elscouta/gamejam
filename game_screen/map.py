@@ -345,6 +345,51 @@ def _fill_initial_surface():
         room_x += ROOM_WIDTH * TILE_WIDTH
 
 
+def _replace_door_bitmap():
+    global map_surface
+    global closed_door_count
+    global closing_door_sequence
+
+    newly_closed_door: Edge = closing_door_sequence[closed_door_count - 1]
+
+    if newly_closed_door.dir == Edge.VERT:
+        for i in range(-1, 0):
+            room: Room = rooms[newly_closed_door.x][newly_closed_door.y + i]
+            tile_i = 6 if i == -1 else 0
+            tile_j = DOOR_POSITION
+            sprite_id = room.get_tile(tile_i, tile_j).sprite_id
+            x_coord = (room.x * ROOM_WIDTH * TILE_WIDTH) + tile_i * TILE_WIDTH
+            y_coord = (room.y * ROOM_HEIGHT * TILE_HEIGHT) + tile_j * TILE_HEIGHT
+            map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
+
+    if newly_closed_door.dir == Edge.HORIZ:
+        for i in range(-1, 0):
+            room: Room = rooms[newly_closed_door.x + 1][newly_closed_door.y]
+            tile_i = DOOR_POSITION
+            tile_j = 6 if i == -1 else 0
+            sprite_id = room.get_tile(tile_i, tile_j).sprite_id
+            x_coord = (room.x * ROOM_WIDTH * TILE_WIDTH) + tile_i * TILE_WIDTH
+            y_coord = (room.y * ROOM_HEIGHT * TILE_HEIGHT) + tile_j * TILE_HEIGHT
+            map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
+
+
+    # map_surface = Surface((MAP_WIDTH*ROOM_WIDTH*TILE_WIDTH, MAP_HEIGHT*ROOM_HEIGHT*TILE_HEIGHT))
+    # room_x = 0
+    #
+    # for room_i in range (0, MAP_WIDTH):
+    #     room_y = 0
+    #
+    #     for room_j in range (0, MAP_HEIGHT):
+    #         for tile_i in range (0, ROOM_WIDTH):
+    #             for tile_j in range (0, ROOM_HEIGHT):
+    #                 sprite_id = rooms[room_i][room_j].get_tile(tile_i, tile_j).sprite_id
+    #                 x_coord = room_x + tile_i * TILE_WIDTH
+    #                 y_coord = room_y + tile_j * TILE_HEIGHT
+    #                 map_surface.blit(get_sprite(sprite_id), (x_coord, y_coord))
+    #         room_y += ROOM_HEIGHT * TILE_HEIGHT
+    #     room_x += ROOM_WIDTH * TILE_WIDTH
+
+
 def _determine_initial_room():
     global initial_room
 
@@ -519,7 +564,7 @@ def close_door():
     global closed_door_count
     global closing_door_sound
     closed_door_count += 1
-    _fill_initial_surface()
+    _replace_door_bitmap()
     pg.mixer.Channel(2).play(closing_door_sound)
 
 
