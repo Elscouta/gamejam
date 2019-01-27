@@ -14,8 +14,11 @@ def schedule_event(callback, timer_in_ticks, oneshot=True):
     event = Event(callback, oneshot=oneshot, timer=timer_in_ticks)
     _events.add(event)
 
+    return event
+
 def clear_event(event):
-    _events.remove(event)
+    if event in _events:
+        _events.remove(event)
 
 def tick():
     for event in _events.copy():

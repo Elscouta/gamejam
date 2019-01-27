@@ -108,6 +108,10 @@ def get_y():
     return _state.y
 
 
+def get_pos():
+    return _state.x, _state.y
+
+
 def init():
     global sprites
     global footstep_sound

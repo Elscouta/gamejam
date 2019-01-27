@@ -25,7 +25,7 @@ class TitleScreen(Screen):
             self.blue = 255
 
     def draw(self, screen: pg.Surface, clock: pg.time.Clock, player_speed: int) -> bool:
-        surface = self.font.render('Poop for Glory!', False, (self.red, self.green, self.blue))
+        surface = self.font.render('A Loo In the Dark', False, (self.red, self.green, self.blue))
         text_rec = surface.get_rect(center=(screen.get_size()[0] // 2, screen.get_size()[1] // 2))
         screen.blit(surface, text_rec)
         self.update_colors()

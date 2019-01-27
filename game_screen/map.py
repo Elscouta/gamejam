@@ -52,6 +52,11 @@ class Room:
         if dtb is not None:
             rooms[self.x][self.y].distance_to_bed = dtb
 
+    @property
+    def rect(self):
+        return Rect(self.x * ROOM_WIDTH*TILE_WIDTH, self.y * ROOM_HEIGHT*TILE_HEIGHT,
+                    ROOM_WIDTH*TILE_WIDTH, ROOM_HEIGHT*TILE_HEIGHT)
+
     def north(self):
         return h_edges[self.x][self.y]
 

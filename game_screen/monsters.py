@@ -11,11 +11,6 @@ from game_screen.asset import get_sprite, WARNING, get_shadow_halo
 from threat_bubble import ThreatBubble
 from utils import distance
 
-PHASE_EXPLORATION = 0
-PHASE_RUNAWAY = 1
-
-cycle_number = 0
-phase = PHASE_EXPLORATION
 spawn_rate = 40
 spawn_event = None
 
@@ -106,6 +101,8 @@ def destroy_all():
     for m in _monsters:
         m.destroy()
     _monsters.clear()
+    if spawn_event:
+        clear_event(spawn_event)
 
 
 def draw_all(screen):
@@ -113,6 +110,6 @@ def draw_all(screen):
         m.draw(screen)
 
 
-def init():
-    schedule_event(spawn, MONSTER_SPAWN_INTERVAL * 10, oneshot=False)
-    schedule_event(map.close_door, 45 * 10, oneshot=False)
+def start_spawning():
+    global spawn_event
+    spawn_event = schedule_event(spawn, MONSTER_SPAWN_INTERVAL * 10, oneshot=False)

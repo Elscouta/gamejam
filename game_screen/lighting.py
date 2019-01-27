@@ -39,9 +39,10 @@ def draw_light_source(light_mask, source_x, source_y, source_radius):
 
     halo = get_light_halo(source_radius)
     room = map.get_room(source_x, source_y)
-    clipped_halo = clip_light_halo_by_room(halo, room, source_x, source_y, source_radius)
-    light_mask.blit(clipped_halo, map.to_screen_coords(get_light_area(source_x, source_y, source_radius)),
+    light_mask.set_clip(map.to_screen_coords(room.rect))
+    light_mask.blit(halo, map.to_screen_coords(get_light_area(source_x, source_y, source_radius)),
                     special_flags=BLEND_RGBA_MIN)
+    light_mask.set_clip(None)
 
     for d in map.DIRECTIONS:
         edge = map.get_dir(room, d)
@@ -54,12 +55,13 @@ def draw_light_source(light_mask, source_x, source_y, source_radius):
         if edge_dist > source_radius:
             continue
 
+        adj_room = map.get_dir(edge, d)
         secondary_radius = source_radius - edge_dist
         secondary_halo = get_light_halo(int(secondary_radius))
-        clipped_halo = clip_light_halo_by_room(secondary_halo, map.get_dir(edge, d),
-                                               edge_x, edge_y, secondary_radius)
-        light_mask.blit(clipped_halo, map.to_screen_coords(get_light_area(edge_x, edge_y, secondary_radius)),
+        light_mask.set_clip(map.to_screen_coords(adj_room.rect))
+        light_mask.blit(secondary_halo, map.to_screen_coords(get_light_area(edge_x, edge_y, secondary_radius)),
                          special_flags=BLEND_RGBA_MIN)
+        light_mask.set_clip(None)
 
 
 def reduce_player_light(impact=1):
@@ -69,6 +71,14 @@ def reduce_player_light(impact=1):
         player_lightning_radius = 1
 
 
+def decay_player_extra_light():
+    global player_lightning_radius
+    from game_screen import logic
+
+    if not logic.is_player_safe() and player_lightning_radius > 128:
+        player_lightning_radius = int(0.9 * player_lightning_radius)
+
+
 def rotate_lights():
     pass
 
@@ -76,3 +86,4 @@ def rotate_lights():
 def init():
     schedule_event(rotate_lights, 1, oneshot=False)
     schedule_event(reduce_player_light, 30, oneshot=False)
+    schedule_event(decay_player_extra_light, 1, oneshot=False)

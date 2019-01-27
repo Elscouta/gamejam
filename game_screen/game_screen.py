@@ -2,7 +2,8 @@ import pygame as pg
 from pygame import Surface, SRCALPHA
 from pygame.color import Color
 
-from game_screen import player, monsters, map, asset
+from game_screen import player, monsters, map, asset, logic, lighting
+from game_screen.logic import GameOverEx
 from screen import Screen
 
 
@@ -12,7 +13,8 @@ class GameScreen(Screen):
         map.init()
         map.print()
         player.init()
-        monsters.init()
+        lighting.init()
+        logic.init()
 
     def draw(self, screen: Surface, clock: pg.time.Clock, player_speed: int) -> bool:
         player.handle_keys()
@@ -28,6 +30,11 @@ class GameScreen(Screen):
         monsters.draw_all(screen)
 
         clock.tick(60)
+        try:
+            logic.tick()
+        except GameOverEx:
+            return True
+
         fps = clock.get_fps()
         if fps > 0:
             player_speed = player_speed * (60 / fps)
