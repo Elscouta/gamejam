@@ -50,8 +50,27 @@ def is_player_safe():
     return _state.phase == PHASE_SAFE
 
 
+class WonEx(Exception):
+    pass
+
 class GameOverEx(Exception):
     pass
+
+
+@trigger
+class Won:
+    eligible_states = {PHASE_RUNAWAY, PHASE_EXPLORATION}
+
+    def condition(self):
+        px, py = player.get_pos()
+        print(map.get_room(px, py))
+        return map.get_room(px, py) == map.final_room
+
+    def action(self):
+        monsters.destroy_all()
+        _state.phase = PHASE_SAFE
+        stop_music()
+        raise WonEx()
 
 
 @trigger

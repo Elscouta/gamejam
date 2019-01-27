@@ -377,6 +377,7 @@ def _bfs_scan_creation():
         raise MapCreationFailed('No candidates for final room.')
     final_room = random.choice(wc_candidates)
     final_room.replace(WC)
+    final_room = rooms[final_room.x][final_room.y]
 
     # 3 -- Determine the closing door sequence
     closing_doors_count = len(closing_door_sequence)

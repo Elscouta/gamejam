@@ -7,8 +7,9 @@ from pygame.color import Color
 from defeat_screen.defeat_screen import DefeatScreen
 from game_screen import player, monsters, map, logic, lighting
 import asset
-from game_screen.logic import GameOverEx
+from game_screen.logic import GameOverEx, WonEx
 from screen import Screen, ScreenType
+from victory_screen.end_screen import EndScreen
 
 
 class GameScreen(Screen):
@@ -37,6 +38,8 @@ class GameScreen(Screen):
             logic.tick()
         except GameOverEx:
             return DefeatScreen
+        except WonEx:
+            return EndScreen
 
         fps = clock.get_fps()
         if fps > 0:
