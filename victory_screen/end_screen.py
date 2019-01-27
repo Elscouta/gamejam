@@ -44,15 +44,11 @@ class EndScreen(Screen):
     def draw_scene(self, screen, rect):
         screen.blit(self.toilet_scene, rect)
 
-        character_rec = (self.player_sprites[3][self.current_sprite]).get_rect(
+        character_rec = (self.player_sprites[3][self.current_sprite // 30]).get_rect(
             center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - (45 + self.sprite_speed_delta)))
 
-        screen.blit(self.player_sprites[3][self.current_sprite], character_rec)
+        screen.blit(self.player_sprites[3][self.current_sprite // 30], character_rec)
 
-        self.sprite_speed_delta += 1
-        self.current_sprite += 1
-        if self.current_sprite == 3:
-            self.current_sprite = 0
 
     def draw_toilets(self, screen):
         if self.rect.y > 0:
@@ -61,8 +57,12 @@ class EndScreen(Screen):
             screen.blit(self.toilet_scene, self.rect)
             for _ in range(0, self.get_pixels_to_move(30)):
                 if self.rect.y < 0:
-                    self.draw_scene(screen, self.rect)
                     self.rect.y += 3
+                self.sprite_speed_delta += 1
+                self.current_sprite += 1
+                if self.current_sprite == 90:
+                    self.current_sprite = 0
+            self.draw_scene(screen, self.rect)
 
     def set_variables(self):
         self.should_draw_toilets = True

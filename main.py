@@ -2,6 +2,7 @@ import os
 import sys
 
 import pygame as pg
+from pygame.constants import DOUBLEBUF
 from pygame.locals import *
 
 import asset
@@ -49,4 +50,4 @@ while True:
     if screenChange:
         currentDisplayScreen = screenChange()
 
-    pg.display.update()
+    pg.display.flip()
