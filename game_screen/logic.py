@@ -75,7 +75,8 @@ class GameOver:
     eligible_states = (PHASE_EXPLORATION, PHASE_RUNAWAY)
 
     def condition(self):
-        return lighting.player_lightning_radius <= 1
+        print(lighting.player_lightning_radius)
+        return lighting.player_lightning_radius <= 50
 
     def action(self):
         raise GameOverEx()

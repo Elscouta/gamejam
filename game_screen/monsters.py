@@ -53,7 +53,7 @@ class Monster:
         shadow = get_shadow_halo(240)
         screen.blit(shadow, map.to_screen_coords(self.x - 240, self.y - 240))
 
-        if (self.get_distance_to_player() / TILE_WIDTH < self.warning_sign_active):
+        if self.get_distance_to_player() / TILE_WIDTH < self.warning_sign_active:
             screen.blit(get_sprite(WARNING), map.to_screen_coords(self.x, self.y))
 
     def get_distance_to_player(self):

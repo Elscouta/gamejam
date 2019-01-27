@@ -8,6 +8,7 @@ import asset
 import events
 from config import SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_SPEED
 from defeat_screen.defeat_screen import DefeatScreen
+from game_screen.game_screen import GameScreen
 from victory_screen.end_screen import EndScreen
 from screen import Screen
 from title_screen.title_screen import TitleScreen
@@ -35,7 +36,7 @@ while True:
             pg.quit()
             sys.exit()
         if type(currentDisplayScreen) == TitleScreen and event.type == KEYDOWN and event.key == K_RETURN:
-            currentDisplayScreen = DefeatScreen()
+            currentDisplayScreen = GameScreen()
 
         if event.type == USEREVENT:
             events.tick()

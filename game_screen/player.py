@@ -60,7 +60,6 @@ def handle_keys():
     pixel_moves = millipixels // 1000
     _state.remaining_millipixels = pixel_moves % 1000
 
-
     for _ in range(0, pixel_moves):
         new_x = _state.x
         new_y = _state.y
@@ -68,11 +67,11 @@ def handle_keys():
 
         if key[pg.K_DOWN]:
             new_y = new_y + dist
-            _state.image = asset.get_player_sprites[0][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites()[0][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
         elif key[pg.K_UP]:
             new_y = new_y - dist
-            _state.image = asset.get_player_sprites[3][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites()[3][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
 
         if _valid_position(new_x, new_y):
@@ -84,12 +83,12 @@ def handle_keys():
 
         if key[pg.K_RIGHT]:
             new_x = new_x + dist
-            _state.image = asset.get_player_sprites[2][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites()[2][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
             moving = True
         elif key[pg.K_LEFT]:
             new_x = new_x - dist
             moving = True
-            _state.image = asset.get_player_sprites[1][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
+            _state.image = asset.get_player_sprites()[1][_state.current_horizontal_cycle // PLAYER_FRAME_LENGTH]
 
         if _valid_position(new_x, new_y):
             _state.x = new_x

@@ -29,7 +29,7 @@ class DefeatScreen(Screen):
 
         for i in range(-2, 3):
             for j in range(-2, 3):
-                screen.blit(get_sprite(FLOOR), (cx + i*TILE_WIDTH, cy + j*TILE_HEIGHT))
+                screen.blit(get_sprite(FLOOR), (cx + i*TILE_WIDTH, cy + j * TILE_HEIGHT))
 
         if self.step == 1:
             screen.blit(get_sprite(OHNOES1), (cx - TILE_WIDTH // 2, cy - TILE_HEIGHT // 2))
