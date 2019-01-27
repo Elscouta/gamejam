@@ -58,3 +58,6 @@ sdl_controllers.txt
 
 # Vim
 *.swp
+
+dist/
+build/
