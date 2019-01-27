@@ -14,6 +14,8 @@ from title_screen.title_screen import TitleScreen
 
 pg.init()
 
+pg.mouse.set_visible(False)
+
 pg.mixer_music.load(os.path.join('assets', 'music.ogg'))
 pg.mixer_music.play(-1)
 pg.mixer_music.set_volume(1)
