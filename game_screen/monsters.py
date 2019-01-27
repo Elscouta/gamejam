@@ -21,8 +21,8 @@ class Monster:
     def __init__(self):
         self._events = set()
         self.monster_sound = pygame.mixer.Sound(os.path.join('assets', 'sfx_scream.wav'))
-        self.monster_sound.set_volume(0.1)
-
+        self.monster_sound.set_volume(1)
+        self.monster_sound.play()
         self._events.add(schedule_event(self.announce_itself, MONSTER_ANNOUNCE_INTERVAL*10 + 1, oneshot=False))
         self._events.add(schedule_event(self.move, MONSTER_MOVE_INTERVAL*10, oneshot=False))
         self._events.add(schedule_event(self.switch_warning_sign, MONSTER_WARNING_INTERVAL, oneshot=False))

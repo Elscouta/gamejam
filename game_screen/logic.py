@@ -67,7 +67,7 @@ class OutOfBed:
 
         _state.phase = PHASE_EXPLORATION
         monsters.start_spawning()
-        closing_door_event = schedule_event(map.close_door, 45 * 10, oneshot=False)
+        closing_door_event = schedule_event(map.close_door, 20 * 10, oneshot=False)
 
 
 @trigger

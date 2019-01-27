@@ -24,14 +24,14 @@ def get_next_screen(current_displayed_screen: Screen) -> Screen:
 pg.init()
 
 pg.mixer_music.load(os.path.join('assets', 'music.ogg'))
-pg.mixer_music.play(-1)
-pg.mixer_music.set_volume(0.5)
+# pg.mixer_music.play(-1)
+pg.mixer_music.set_volume(0.1)
 
 currentDisplayScreen: Screen = None
 
 screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))#, FULLSCREEN)
 
-pg.display.set_caption("Poop for Glory!")
+pg.display.set_caption("A loo in the dark!")
 
 events.init()
 

@@ -97,7 +97,7 @@ def handle_keys():
 
         if moving:
             increment_cycle()
-            footstep_sound.play()
+            pg.mixer.Channel(1).play(footstep_sound)
 
 
 def get_x():
@@ -116,7 +116,7 @@ def init():
     global sprites
     global footstep_sound
     footstep_sound = pg.mixer.Sound(os.path.join('assets', 'sfx_footsteps.wav'))
-    footstep_sound.set_volume(0.1)
+    footstep_sound.set_volume(0.02)
     _state.x, _state.y = map.initial_room.get_initial_position()
     _state.last_tick = time.get_ticks()
 

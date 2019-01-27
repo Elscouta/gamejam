@@ -1,4 +1,6 @@
+import os
 import random
+import pygame as pg
 from itertools import chain, product
 from sys import stdout
 
@@ -22,6 +24,7 @@ v_edges = None
 initial_room = None
 final_room = None
 map_surface = None
+closing_door_sound = None
 closing_door_sequence = None
 closed_door_count = 10
 light_sources = None
@@ -387,6 +390,9 @@ def _bfs_scan_creation():
     for i in range(0, min(closing_doors_count, MAX_CLOSING_DOORS)):
         closing_door_sequence[i].replace(ClosingDoor(i))
 
+def _init_sound():
+    global closing_door_sound
+    closing_door_sound = pg.mixer.Sound(os.path.join('assets', 'sfx_footsteps.wav'))
 
 def _create():
     global rooms, h_edges, v_edges
@@ -471,6 +477,7 @@ def _position_light_sources():
 
 def init():
     _create()
+    _init_sound()
     _determine_initial_room()
     _bfs_scan_creation()
     _fill_initial_surface()
@@ -485,8 +492,10 @@ def draw(screen, light_mask):
 
 def close_door():
     global closed_door_count
+    global closing_door_sound
     closed_door_count += 1
     _fill_initial_surface()
+    pg.mixer.Channel(2).play(closing_door_sound)
 
 
 def get_room(coord_x, coord_y):
