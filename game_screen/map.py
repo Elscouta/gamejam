@@ -569,7 +569,7 @@ def _create():
         }
 
 
-def _position_light_sources_and_furniture():
+def _position_light_sources():
     global light_sources
 
     light_sources = []
@@ -586,6 +586,8 @@ def _position_light_sources_and_furniture():
             x, y = edge.get_pixel_coords()
             light_sources.append((x, y, 96))
 
+
+def _position_furniture():
     for f in [BPaint, OPaint, OPaint, GPaint, GPaint] * 4:
         x = random.randint(0, MAP_WIDTH-1)
         y = random.randint(0, MAP_HEIGHT-1)
@@ -606,8 +608,9 @@ def init():
     _init_sound()
     _determine_initial_room()
     _bfs_scan_creation()
-    _position_light_sources_and_furniture()
+    _position_furniture()
     _fill_initial_surface()
+    _position_light_sources()
 
 
 def draw(screen, light_mask):
