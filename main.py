@@ -6,8 +6,7 @@ from pygame.locals import *
 
 import asset
 import events
-from config import SCREEN_HEIGHT, SCREEN_WIDTH, PLAYER_SPEED
-from defeat_screen.defeat_screen import DefeatScreen
+from config import SCREEN_HEIGHT, SCREEN_WIDTH
 from game_screen.game_screen import GameScreen
 from victory_screen.end_screen import EndScreen
 from screen import Screen
@@ -16,17 +15,17 @@ from title_screen.title_screen import TitleScreen
 pg.init()
 
 pg.mixer_music.load(os.path.join('assets', 'music.ogg'))
-pg.mixer_music.play(-1)
+# pg.mixer_music.play(-1)
 pg.mixer_music.set_volume(1)
 
-screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) #, FULLSCREEN)
+screen: pg.Surface = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FULLSCREEN)
 
 events.init()
 asset.init()
 
 pg.display.set_caption("A loo in the dark!")
 
-currentDisplayScreen: Screen = TitleScreen()
+currentDisplayScreen: Screen = EndScreen()
 
 clock = pg.time.Clock()
 
@@ -35,7 +34,8 @@ while True:
         if event.type == QUIT or event.type == KEYDOWN and event.key == K_ESCAPE:
             pg.quit()
             sys.exit()
-        if type(currentDisplayScreen) == TitleScreen and event.type == KEYDOWN and event.key == K_RETURN:
+        if type(currentDisplayScreen) == TitleScreen or type(currentDisplayScreen) == EndScreen \
+                and event.type == KEYDOWN and event.key == K_RETURN:
             currentDisplayScreen = GameScreen()
 
         if event.type == USEREVENT:

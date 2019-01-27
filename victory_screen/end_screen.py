@@ -19,8 +19,8 @@ class EndScreen(Screen):
         self.sprite_speed_delta = 0
         self.time = None
         self.isPlayingPeeSound = False
-        self.toilet_scene: pg.Surface = pg.image.load(os.path.join('assets', 'bathroom_scene.png'))
-        self.character_scene: pg.Surface = pg.image.load(os.path.join('assets', 'happy_child.png'))
+        self.toilet_scene: pg.Surface = pg.image.load(os.path.join('assets', 'bathroom_scene.png')).convert_alpha()
+        self.character_scene: pg.Surface = pg.image.load(os.path.join('assets', 'happy_child.png')).convert_alpha()
         self.rect = pg.rect.Rect(0, SCREEN_HEIGHT - self.toilet_scene.get_size()[1], self.toilet_scene.get_size()[0],
                                  SCREEN_HEIGHT)
 
@@ -40,7 +40,7 @@ class EndScreen(Screen):
         screen.blit(self.toilet_scene, rect)
 
         character_rec = (self.player_sprites[3][self.current_sprite]).get_rect(center=(screen.get_size()[0] // 2,
-                                                                                       screen.get_size()[1] - (50 + self.sprite_speed_delta))
+                                                                                       screen.get_size()[1] - (45 + self.sprite_speed_delta))
                                                                                )
         screen.blit(self.player_sprites[3][self.current_sprite], character_rec)
         self.sprite_speed_delta += 1
