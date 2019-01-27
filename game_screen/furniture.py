@@ -1,6 +1,7 @@
 from abc import abstractmethod, ABC
 
-from game_screen.tile import PaintNW, PaintSW, PaintNE, PaintSE
+from game_screen.tile import BPaintNW, BPaintSW, BPaintNE, BPaintSE, OPaintNW, OPaintSW, OPaintNE, OPaintSE, GPaintSE, \
+    GPaintNE, GPaintSW, GPaintNW
 
 
 class Furniture(ABC):
@@ -23,14 +24,38 @@ class Furniture(ABC):
         ...
 
 
-class Paint(Furniture):
+class BPaint(Furniture):
     width = 2
     height = 2
 
     def get_tile(self, x, y):
         return {
-            (0, 0): PaintNW,
-            (0, 1): PaintSW,
-            (1, 0): PaintNE,
-            (1, 1): PaintSE
+            (0, 0): BPaintNW,
+            (0, 1): BPaintSW,
+            (1, 0): BPaintNE,
+            (1, 1): BPaintSE
+        }[x, y]
+
+class OPaint(Furniture):
+    width = 2
+    height = 2
+
+    def get_tile(self, x, y):
+        return {
+            (0, 0): OPaintNW,
+            (0, 1): OPaintSW,
+            (1, 0): OPaintNE,
+            (1, 1): OPaintSE
+        }[x, y]
+
+class GPaint(Furniture):
+    width = 2
+    height = 2
+
+    def get_tile(self, x, y):
+        return {
+            (0, 0): GPaintNW,
+            (0, 1): GPaintSW,
+            (1, 0): GPaintNE,
+            (1, 1): GPaintSE
         }[x, y]

@@ -12,7 +12,7 @@ from asset import get_sprite
 from config import MAP_WIDTH, MAP_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, TILE_WIDTH, TILE_HEIGHT, DOOR_POSITION, SCREEN_WIDTH, \
     SCREEN_HEIGHT, MIN_DISTANCE_WC_BED, MAX_DISTANCE_WC_BED, CLOSING_DOORS_SWAPS, \
     MAX_CLOSING_DOORS
-from game_screen.furniture import Paint, Furniture
+from game_screen.furniture import BPaint, Furniture, GPaint, OPaint
 from game_screen.lighting import draw_light_source, get_light_source_dampening
 from game_screen.tile import WestWall, SouthWestCorner, WestOpenDoor, NorthOpenDoor, SouthOpenDoor, Floor, \
     NorthEastCorner, \
@@ -473,7 +473,7 @@ def _bfs_scan_creation():
 
     # Add paint to the an adjacent room
     adjacent_room = random.choice(first_room_candidates)
-    adjacent_room.add_furniture(Paint(1, 4))
+    adjacent_room.add_furniture(BPaint(1, 4))
 
     # 3 -- Determine the closing door sequence
     closing_doors_count = len(closing_door_sequence)
@@ -586,14 +586,28 @@ def _position_light_sources_and_furniture():
             x, y = edge.get_pixel_coords()
             light_sources.append((x, y, 96))
 
+    for f in [BPaint, OPaint, OPaint, GPaint, GPaint] * 4:
+        x = random.randint(0, MAP_WIDTH-1)
+        y = random.randint(0, MAP_HEIGHT-1)
+
+        if rooms[x][y] in (initial_room, final_room):
+            continue
+
+        if rooms[x][y].furnitures:
+            continue
+
+        i = random.randint(1, 4)
+        j = random.randint(1, 4)
+        rooms[x][y].add_furniture(f(i, j))
+
 
 def init():
     _create()
     _init_sound()
     _determine_initial_room()
     _bfs_scan_creation()
-    _fill_initial_surface()
     _position_light_sources_and_furniture()
+    _fill_initial_surface()
 
 
 def draw(screen, light_mask):

@@ -4,7 +4,11 @@ from itertools import product
 
 import pygame as pg
 from pygame import time
+
+from pygame.color import Color
+from pygame.constants import SRCALPHA, BLEND_RGBA_MULT
 from pygame.mixer import SoundType
+from pygame.surface import Surface
 
 import asset
 from config import TILE_WIDTH, TILE_HEIGHT, PLAYER_SPEED, SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_HEIGHT, PLAYER_WIDTH, \
@@ -25,6 +29,7 @@ class _state:
     last_tick = None
     current_dir = 0
     paint_level = None
+    paint_color = None
 
 
 
@@ -55,22 +60,40 @@ def draw_footstep(sprite):
 
     rotated_sprite = get_rotated(sprite, _state.current_dir)
     rect = rotated_sprite.get_rect()
+
+    if _state.paint_level < 1000:
+        alpha_mask = Surface((rotated_sprite.get_width(), rotated_sprite.get_height()), flags=SRCALPHA)
+        alpha_mask.fill(Color(255, 255, 255, int(255*_state.paint_level/1000)))
+        rotated_sprite = rotated_sprite.copy()
+        rotated_sprite.blit(alpha_mask, (0, 0), special_flags=BLEND_RGBA_MULT)
+
     map.map_surface.blit(rotated_sprite, (_state.x - rect.x // 2,
                                           _state.y + PLAYER_HEIGHT // 2 - rect.y // 2))
 
+
+
+
+FOOTPRINTS = {
+    'blue': (asset.BFOOTPRINT_LEFT, asset.BFOOTPRINT_RIGHT),
+    'orange': (asset.OFOOTPRINT_LEFT, asset.OFOOTPRINT_RIGHT),
+    'green': (asset.GFOOTPRINT_LEFT, asset.GFOOTPRINT_RIGHT)
+}
 
 def increment_cycles():
     _state.current_horizontal_cycle = (_state.current_horizontal_cycle + 1) % PLAYER_FRAME_ROTATION
     _state.current_paint_cycle = (_state.current_paint_cycle + 1) % (24 * 2)
     _state.paint_level = max(_state.paint_level - 1, 0)
-    if _state.current_paint_cycle == 0 and _state.paint_level:
-        draw_footstep(asset.get_sprite(asset.FOOTPRINT_LEFT))
-    if _state.current_paint_cycle == 24 and _state.paint_level:
-        draw_footstep(asset.get_sprite(asset.FOOTPRINT_RIGHT))
+    if _state.paint_level:
+        fleft, fright = FOOTPRINTS[_state.paint_color]
+        if _state.current_paint_cycle == 0:
+            draw_footstep(asset.get_sprite(fleft))
+        if _state.current_paint_cycle == 24:
+            draw_footstep(asset.get_sprite(fright))
 
 
-def add_paint():
+def add_paint(color):
     _state.paint_level = PAINT_POWER
+    _state.paint_color = color
 
 
 def handle_keys():

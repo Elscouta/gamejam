@@ -2,11 +2,11 @@ from pygame.rect import Rect
 
 from asset import NW_CORNER, N_WALL, NE_CORNER, W_WALL, FLOOR, E_WALL, SW_CORNER, S_WALL, SE_CORNER, N_DOOR, \
     W_DOOR, \
-    E_DOOR, S_DOOR, N_DOORWAY, W_DOORWAY, E_DOORWAY, S_DOORWAY, BEDSIDE_LAMP, BED_TOP, BED_BOTTOM, PAINT_NW, PAINT_NE, \
-    PAINT_SW, PAINT_SE, PORCELAIN_NW_CORNER, PORCELAIN_N_WALL, PORCELAIN_N_DOOR, PORCELAIN_N_DOORWAY, \
+    E_DOOR, S_DOOR, N_DOORWAY, W_DOORWAY, E_DOORWAY, S_DOORWAY, BEDSIDE_LAMP, BED_TOP, BED_BOTTOM, BPAINT_NW, BPAINT_NE, \
+    BPAINT_SW, BPAINT_SE, PORCELAIN_NW_CORNER, PORCELAIN_N_WALL, PORCELAIN_N_DOOR, PORCELAIN_N_DOORWAY, \
     PORCELAIN_NE_CORNER, PORCELAIN_W_WALL, PORCELAIN_W_DOOR, PORCELAIN_W_DOORWAY, PORCELAIN_FLOOR, PORCELAIN_E_WALL, \
     PORCELAIN_E_DOOR, PORCELAIN_E_DOORWAY, PORCELAIN_SW_CORNER, PORCELAIN_S_WALL, PORCELAIN_S_DOOR, PORCELAIN_S_DOORWAY, \
-    PORCELAIN_SE_CORNER
+    PORCELAIN_SE_CORNER, OPAINT_NW, OPAINT_NE, OPAINT_SW, OPAINT_SE, GPAINT_NW, GPAINT_NE, GPAINT_SW, GPAINT_SE
 from config import WALL_WIDTH, TILE_WIDTH, PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_CROP_BOTTOM, \
     PLAYER_CROP_TOP, PLAYER_CROP_RIGHT, PLAYER_CROP_LEFT
 from game_screen import player
@@ -78,11 +78,19 @@ BedsideLamp = Tile(BEDSIDE_LAMP, bboxs=(Rect(0, 0, 64, 64),))
 BedTop = Tile(BED_TOP, bboxs=(Rect(0, 0, 64, 64),))
 BedBottom = Tile(BED_BOTTOM, bboxs=(Rect(0, 0, 64, 45),))
 
-def add_paint():
+def add_paint(color):
     from game_screen import player
-    player.add_paint()
+    player.add_paint(color)
 
-PaintNW = Tile(PAINT_NW, bboxs=(Rect(44, 54, 20, 10),), solid=False, event=add_paint)
-PaintNE = Tile(PAINT_NE, bboxs=(Rect(0, 54, 20, 10),), solid=False, event=add_paint)
-PaintSW = Tile(PAINT_SW, bboxs=(Rect(44, 0, 20, 5),), solid=False, event=add_paint)
-PaintSE = Tile(PAINT_SE, bboxs=(Rect(0, 0, 20, 5),), solid=False, event=add_paint)
+BPaintNW = Tile(BPAINT_NW, bboxs=(Rect(44, 54, 20, 10),), solid=False, event=lambda: add_paint('blue'))
+BPaintNE = Tile(BPAINT_NE, bboxs=(Rect(0, 54, 20, 10),), solid=False, event=lambda: add_paint('blue'))
+BPaintSW = Tile(BPAINT_SW, bboxs=(Rect(44, 0, 20, 5),), solid=False, event=lambda: add_paint('blue'))
+BPaintSE = Tile(BPAINT_SE, bboxs=(Rect(0, 0, 20, 5),), solid=False, event=lambda: add_paint('blue'))
+OPaintNW = Tile(OPAINT_NW, bboxs=(Rect(44, 54, 20, 10),), solid=False, event=lambda: add_paint('orange'))
+OPaintNE = Tile(OPAINT_NE, bboxs=(Rect(0, 54, 20, 10),), solid=False, event=lambda: add_paint('orange'))
+OPaintSW = Tile(OPAINT_SW, bboxs=(Rect(44, 0, 20, 5),), solid=False, event=lambda: add_paint('orange'))
+OPaintSE = Tile(OPAINT_SE, bboxs=(Rect(0, 0, 20, 5),), solid=False, event=lambda: add_paint('orange'))
+GPaintNW = Tile(GPAINT_NW, bboxs=(Rect(44, 54, 20, 10),), solid=False, event=lambda: add_paint('green'))
+GPaintNE = Tile(GPAINT_NE, bboxs=(Rect(0, 54, 20, 10),), solid=False, event=lambda: add_paint('green'))
+GPaintSW = Tile(GPAINT_SW, bboxs=(Rect(44, 0, 20, 5),), solid=False, event=lambda: add_paint('green'))
+GPaintSE = Tile(GPAINT_SE, bboxs=(Rect(0, 0, 20, 5),), solid=False, event=lambda: add_paint('green'))
